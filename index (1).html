@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NEXUS — מרכז פיקוד קריפטו</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@400;500&family=Heebo:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg0:#020408;--bg1:#060d16;--bg2:#0b1626;--bg3:#101f35;
+  --border:#152a45;--border2:#1e3d60;
+  --neon:#00c8f0;--neon2:rgba(0,200,240,.15);--neon3:rgba(0,200,240,.06);
+  --buy:#00e87a;--buy2:rgba(0,232,122,.12);--buy3:rgba(0,232,122,.06);
+  --sell:#ff3355;--sell2:rgba(255,51,85,.12);--sell3:rgba(255,51,85,.06);
+  --wait:#f0a800;--wait2:rgba(240,168,0,.1);
+  --t1:#d0e8ff;--t2:#6b8fb5;--t3:#2a4a6e;--t4:#0f2035;
+  --r:4px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg0);color:var(--t1);font-family:'Heebo',sans-serif;font-size:14px;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse 70% 50% at 10% 10%,rgba(0,80,200,.08) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 40% at 90% 80%,rgba(0,180,240,.06) 0%,transparent 55%);pointer-events:none}
+body::after{content:'';position:fixed;inset:0;z-index:0;
+  background-image:linear-gradient(rgba(0,200,240,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,200,240,.03) 1px,transparent 1px);
+  background-size:48px 48px;pointer-events:none}
+.scan{position:fixed;inset:0;z-index:1;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,200,240,.008) 2px,rgba(0,200,240,.008) 4px);pointer-events:none}
+.shell{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column}
+
+/* NAV */
+nav{height:56px;display:flex;align-items:center;gap:12px;padding:0 20px;
+  background:rgba(6,13,22,.92);border-bottom:1px solid var(--border);
+  backdrop-filter:blur(16px);position:sticky;top:0;z-index:200}
+.nav-logo{font-family:'Orbitron',monospace;font-size:1rem;font-weight:900;
+  letter-spacing:.22em;color:var(--neon);text-shadow:0 0 12px rgba(0,200,240,.5);white-space:nowrap}
+.nav-links{display:flex;gap:4px;margin-right:20px}
+.nav-link{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.12em;
+  color:var(--t2);background:transparent;border:1px solid transparent;
+  padding:.3rem .7rem;border-radius:var(--r);cursor:pointer;
+  transition:all .18s;text-transform:uppercase;text-decoration:none;display:flex;align-items:center;gap:5px}
+.nav-link:hover{color:var(--neon);border-color:var(--border2);background:var(--neon3)}
+.nav-link.active{color:var(--neon);border-color:var(--neon);background:var(--neon3)}
+.nav-space{flex:1}
+.clk{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--t2)}
+.clk b{color:var(--neon)}
+.live-ind{display:flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--buy);letter-spacing:.1em}
+.ldot{width:6px;height:6px;border-radius:50%;background:var(--buy);box-shadow:0 0 8px var(--buy);animation:lp 2s ease-in-out infinite}
+@keyframes lp{0%,100%{opacity:1}50%{opacity:.4}}
+.hbtn{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.12em;
+  color:var(--t2);background:transparent;border:1px solid var(--border2);
+  padding:.3rem .65rem;border-radius:var(--r);cursor:pointer;transition:all .18s;text-transform:uppercase}
+.hbtn:hover{color:var(--neon);border-color:var(--neon);background:var(--neon3)}
+
+/* PAGES */
+.page{display:none;flex:1;flex-direction:column}
+.page.active{display:flex}
+
+/* ═══ DASHBOARD PAGE ═══ */
+.hero{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:16px}
+@media(min-width:640px){.hero{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:900px){.hero{padding:20px 24px}}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);
+  padding:14px 16px;position:relative;overflow:hidden;transition:border-color .2s}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--neon),transparent);opacity:.4}
+.stat-card:hover{border-color:var(--border2)}
+.sc-lbl{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.18em;
+  color:var(--t2);text-transform:uppercase;margin-bottom:6px}
+.sc-val{font-family:'Orbitron',monospace;font-size:1.6rem;font-weight:700;line-height:1}
+.sc-sub{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--t3);margin-top:4px}
+.prog-track{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;border:1px solid var(--border);margin-top:10px}
+.prog-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#0050cc,var(--neon),#00f0e0);
+  box-shadow:0 0 8px rgba(0,200,240,.4);transition:width 1.2s cubic-bezier(.4,0,.2,1);position:relative}
+.prog-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:2px;background:white;opacity:.8;animation:pb 1.4s ease-in-out infinite}
+@keyframes pb{0%,100%{opacity:.8}50%{opacity:.1}}
+
+.body-grid{display:flex;flex-direction:column;flex:1;padding:0 16px 16px;gap:12px}
+@media(min-width:900px){.body-grid{display:grid;grid-template-columns:220px 1fr;padding:0 24px 24px;gap:16px}}
+
+.sidebar{display:flex;flex-direction:row;gap:12px;flex-wrap:wrap;order:2}
+@media(min-width:900px){.sidebar{flex-direction:column;flex-wrap:nowrap;order:unset}}
+.sb-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px;flex:1;min-width:160px}
+@media(min-width:900px){.sb-panel{flex:unset;min-width:unset}}
+.sb-title{font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:.22em;color:var(--neon);text-transform:uppercase;margin-bottom:12px;opacity:.75}
+.dist-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.dist-lbl{font-family:'JetBrains Mono',monospace;font-size:.65rem;width:36px;letter-spacing:.06em}
+.dist-track{flex:1;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.dist-fill{height:100%;border-radius:2px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.dist-fill.buy{background:linear-gradient(90deg,#00aa55,var(--buy));box-shadow:0 0 6px rgba(0,232,122,.4)}
+.dist-fill.sell{background:linear-gradient(90deg,#cc1133,var(--sell));box-shadow:0 0 6px rgba(255,51,85,.4)}
+.dist-fill.wait{background:linear-gradient(90deg,#cc8800,var(--wait))}
+.dist-cnt{font-family:'JetBrains Mono',monospace;font-size:.68rem;width:20px;text-align:right}
+.regime-box{text-align:center;padding:12px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);margin-top:4px}
+.regime-lbl{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--t2);letter-spacing:.14em;margin-bottom:4px}
+.regime-val{font-family:'Orbitron',monospace;font-size:.85rem;font-weight:700;letter-spacing:.14em}
+.regime-sub{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--t2);margin-top:3px}
+
+.main-col{display:flex;flex-direction:column;gap:12px;order:1;min-width:0}
+@media(min-width:900px){.main-col{order:unset;gap:14px}}
+.filter-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.search-wrap{position:relative;display:flex;align-items:center;flex:1;min-width:180px;max-width:280px}
+.search-ico{position:absolute;right:9px;color:var(--t2);font-size:.9rem;pointer-events:none}
+.search-inp{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);
+  color:var(--t1);font-family:'Heebo',sans-serif;font-size:.8rem;
+  padding:.4rem .7rem .4rem 2rem;outline:none;transition:border-color .2s;direction:rtl}
+.search-inp::placeholder{color:var(--t3)}
+.search-inp:focus{border-color:var(--neon);box-shadow:0 0 0 2px rgba(0,200,240,.12)}
+.fpills{display:flex;gap:6px;flex-wrap:wrap}
+.fpill{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;
+  padding:.3rem .6rem;border-radius:var(--r);border:1px solid var(--border);
+  background:transparent;color:var(--t2);cursor:pointer;transition:all .15s;text-transform:uppercase}
+.fpill:hover{border-color:var(--neon);color:var(--neon)}
+.fpill.a-all{border-color:var(--neon);color:var(--neon);background:var(--neon3)}
+.fpill.a-buy{border-color:var(--buy);color:var(--buy);background:var(--buy3)}
+.fpill.a-sell{border-color:var(--sell);color:var(--sell);background:var(--sell3)}
+.fpill.a-wait{border-color:var(--wait);color:var(--wait);background:var(--wait2)}
+.row-cnt{margin-right:auto;font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--t2);letter-spacing:.08em;white-space:nowrap}
+
+.tbl-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;position:relative;flex:1}
+.tbl-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--neon),transparent);opacity:.2;z-index:2}
+.tbl-scroll{overflow:auto;max-height:calc(100vh - 300px)}
+table{width:100%;border-collapse:collapse}
+thead th{background:rgba(2,4,8,.9);padding:.55rem 12px;font-family:'JetBrains Mono',monospace;
+  font-size:.58rem;letter-spacing:.15em;color:var(--neon);text-transform:uppercase;
+  text-align:right;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5;
+  backdrop-filter:blur(8px);white-space:nowrap}
+tbody tr{border-bottom:1px solid rgba(21,42,69,.5);transition:background .12s;animation:ri .25s ease both}
+tbody tr:hover{background:rgba(0,200,240,.03)}
+@keyframes ri{from{opacity:0;transform:translateX(6px)}to{opacity:1;transform:translateX(0)}}
+tbody tr.row-buy{border-right:2px solid rgba(0,232,122,.5);background:var(--buy3)}
+tbody tr.row-buy:hover{background:rgba(0,232,122,.08)}
+tbody tr.row-sell{border-right:2px solid rgba(255,51,85,.5);background:var(--sell3)}
+tbody tr.row-sell:hover{background:rgba(255,51,85,.08)}
+tbody tr.row-wait{border-right:2px solid rgba(240,168,0,.4);background:var(--wait2)}
+td{padding:.6rem 12px;vertical-align:middle;white-space:nowrap}
+
+.badge{display:inline-flex;align-items:center;gap:4px;padding:.15rem .5rem;border-radius:2px;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:500;letter-spacing:.08em}
+.bdot{width:5px;height:5px;border-radius:50%}
+.b-buy{background:var(--buy2);color:var(--buy);border:1px solid rgba(0,232,122,.3)}
+.b-buy .bdot{background:var(--buy);box-shadow:0 0 4px var(--buy)}
+.b-sell{background:var(--sell2);color:var(--sell);border:1px solid rgba(255,51,85,.3)}
+.b-sell .bdot{background:var(--sell);box-shadow:0 0 4px var(--sell)}
+.b-wait{background:var(--wait2);color:var(--wait);border:1px solid rgba(240,168,0,.25)}
+.b-wait .bdot{background:var(--wait)}
+.b-pos{background:rgba(0,230,118,.07);color:#00e676;border:1px solid rgba(0,230,118,.2)}
+.b-neg{background:rgba(255,23,68,.07);color:#ff1744;border:1px solid rgba(255,23,68,.2)}
+.b-neu{background:rgba(84,110,122,.08);color:#546e7a;border:1px solid rgba(84,110,122,.2)}
+.sym{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.68rem;font-weight:500;
+  padding:.12rem .5rem;background:rgba(0,200,240,.07);border:1px solid rgba(0,200,240,.18);
+  border-radius:2px;color:var(--neon);letter-spacing:.06em}
+.src-b{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.56rem;
+  padding:.1rem .42rem;border-radius:2px;letter-spacing:.06em}
+.s-cp{background:rgba(0,200,240,.08);color:#00c8f0;border:1px solid rgba(0,200,240,.2)}
+.s-ct{background:rgba(240,168,0,.08);color:#f0a800;border:1px solid rgba(240,168,0,.2)}
+.s-tb{background:rgba(0,232,122,.08);color:#00e87a;border:1px solid rgba(0,232,122,.2)}
+.s-dc{background:rgba(160,80,255,.08);color:#a050ff;border:1px solid rgba(160,80,255,.2)}
+.s-uk{background:rgba(107,143,181,.08);color:var(--t2);border:1px solid rgba(107,143,181,.2)}
+.tgt{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--neon)}
+.tgt-na{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--t3)}
+.hl{max-width:240px;overflow:hidden;text-overflow:ellipsis;font-size:.8rem;color:var(--t1);font-weight:300}
+.rs{max-width:200px;overflow:hidden;text-overflow:ellipsis;font-size:.72rem;color:var(--t2)}
+.tc{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--t2)}
+.idx{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--t3);width:28px}
+.col-headline,.col-sentiment,.col-source,.col-reason,.col-time{display:none}
+@media(min-width:600px){.col-headline{display:table-cell}}
+@media(min-width:800px){.col-source,.col-time{display:table-cell}}
+@media(min-width:1024px){.col-sentiment,.col-reason{display:table-cell}}
+
+.empty{padding:3rem 1rem;text-align:center}
+.empty-ico{font-size:1.6rem;opacity:.2;margin-bottom:.8rem}
+.empty-txt{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--t2);letter-spacing:.14em}
+.spinner{width:22px;height:22px;border:2px solid var(--border2);border-top-color:var(--neon);
+  border-radius:50%;animation:spin .65s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.log-panel{background:var(--bg1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.log-hdr{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);background:rgba(2,4,8,.5);cursor:pointer;user-select:none}
+.log-hdr-title{font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--neon);opacity:.7}
+.log-toggle{font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--t2);margin-right:auto}
+.log-refresh{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;
+  color:var(--t2);background:transparent;border:1px solid var(--border);
+  padding:.22rem .55rem;border-radius:2px;cursor:pointer;transition:all .15s}
+.log-refresh:hover{color:var(--neon);border-color:var(--neon)}
+.log-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.log-body.open{max-height:280px}
+.log-lines{height:240px;overflow-y:auto;padding:10px 14px;font-family:'JetBrains Mono',monospace;font-size:.65rem;line-height:1.7;color:var(--t2)}
+.log-line{display:block;white-space:pre-wrap;word-break:break-all;padding:1px 0}
+.log-line.err{color:#ff6680}.log-line.warn{color:#ffc040}.log-line.new-sig{color:var(--buy)}
+
+/* ═══ NEWS PAGE ═══ */
+.news-page-wrap{padding:20px 24px;display:flex;flex-direction:column;gap:16px;flex:1}
+.news-header{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.news-title{font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;
+  letter-spacing:.18em;color:var(--neon);text-shadow:0 0 10px rgba(0,200,240,.4)}
+.news-count{font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--t2);
+  background:var(--bg3);border:1px solid var(--border);padding:.25rem .6rem;border-radius:var(--r)}
+.news-refresh-btn{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:.1em;
+  color:var(--t2);background:transparent;border:1px solid var(--border2);
+  padding:.3rem .65rem;border-radius:var(--r);cursor:pointer;transition:all .18s;text-transform:uppercase}
+.news-refresh-btn:hover{color:var(--neon);border-color:var(--neon);background:var(--neon3)}
+
+.news-src-filter{display:flex;gap:6px;flex-wrap:wrap}
+.news-pill{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.08em;
+  padding:.25rem .55rem;border-radius:var(--r);border:1px solid var(--border);
+  background:transparent;color:var(--t2);cursor:pointer;transition:all .15s}
+.news-pill:hover,.news-pill.active{border-color:var(--neon);color:var(--neon);background:var(--neon3)}
+
+.news-grid{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:640px){.news-grid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:1024px){.news-grid{grid-template-columns:repeat(3,1fr)}}
+
+.news-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);
+  padding:14px;display:flex;flex-direction:column;gap:8px;
+  transition:border-color .2s,box-shadow .2s;cursor:default;
+  position:relative;overflow:hidden;
+  animation:cardIn .3s ease both;
+}
+.news-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--neon),transparent);opacity:.2}
+.news-card:hover{border-color:var(--border2);box-shadow:0 0 16px rgba(0,200,240,.08)}
+.news-card-src{display:flex;align-items:center;gap:6px}
+.news-src-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.news-src-name{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;color:var(--t2)}
+.news-card-title{font-size:.85rem;font-weight:500;color:var(--t1);line-height:1.5;direction:ltr;text-align:left}
+.news-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+.news-analyze-btn{
+  font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;
+  color:var(--neon);background:var(--neon3);border:1px solid rgba(0,200,240,.3);
+  padding:.2rem .55rem;border-radius:2px;cursor:pointer;transition:all .15s;text-transform:uppercase;
+}
+.news-analyze-btn:hover{background:rgba(0,200,240,.2);box-shadow:0 0 8px rgba(0,200,240,.2)}
+.news-analyze-btn:disabled{opacity:.4;cursor:default}
+.news-hot-badge{font-family:'JetBrains Mono',monospace;font-size:.55rem;color:var(--sell);
+  background:rgba(255,51,85,.1);border:1px solid rgba(255,51,85,.25);
+  padding:.15rem .45rem;border-radius:2px}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Src colors */
+.src-coindesk{color:#f59e0b;border-color:rgba(245,158,11,.3)!important}
+.src-cointelegraph{color:#00c8f0;border-color:rgba(0,200,240,.3)!important}
+.src-bitcoincom{color:#f97316;border-color:rgba(249,115,22,.3)!important}
+.src-cryptoslate{color:#a78bfa;border-color:rgba(167,139,250,.3)!important}
+.src-newsbtc{color:#34d399;border-color:rgba(52,211,153,.3)!important}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;z-index:9999;
+  background:var(--bg2);border:1px solid var(--neon);border-right:3px solid var(--neon);
+  color:var(--neon);font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  letter-spacing:.08em;padding:.55rem 1.1rem;border-radius:var(--r);
+  opacity:0;transform:translateX(-16px);transition:opacity .22s,transform .22s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(0)}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg0)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--neon)}
+</style>
+</head>
+<body>
+<div class="scan"></div>
+<div class="shell">
+
+<!-- NAV -->
+<nav>
+  <div>
+    <div class="nav-logo">NEXUS</div>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link active" id="nav-dash" onclick="showPage('dash')">📊 לוח בקרה</a>
+    <a class="nav-link" id="nav-news" onclick="showPage('news')">🔥 חדשות חמות</a>
+  </div>
+  <div class="nav-space"></div>
+  <div class="live-ind"><span class="ldot"></span>חי</div>
+  <div class="clk" id="clk">UTC <b>--:--:--</b></div>
+  <button class="hbtn" onclick="loadSignals()">⟳ סנכרן</button>
+  <button class="hbtn" id="trig-btn" onclick="triggerJob()">▶ סריקה</button>
+</nav>
+
+<!-- DASHBOARD PAGE -->
+<div class="page active" id="page-dash">
+  <div class="hero">
+    <div class="stat-card">
+      <div class="sc-lbl">איתותים היום</div>
+      <div class="sc-val" style="color:var(--neon)" id="s-today">–</div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <div class="sc-sub" id="s-rem-sub">– נותרו</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-lbl">סה"כ בבסיס</div>
+      <div class="sc-val" style="color:var(--t1)" id="s-total">–</div>
+      <div class="sc-sub">איתותים</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-lbl">כיוון השוק</div>
+      <div class="sc-val" id="regime-hero" style="color:var(--t2);font-size:1rem">–</div>
+      <div class="sc-sub" id="regime-sub-hero">ממתין לנתונים</div>
+    </div>
+    <div class="stat-card">
+      <div class="sc-lbl">סנכרון אחרון</div>
+      <div class="sc-val" style="font-size:1rem;color:var(--t1)" id="s-sync">–</div>
+      <div class="sc-sub">UTC</div>
+    </div>
+  </div>
+
+  <div class="body-grid">
+    <aside class="sidebar">
+      <div class="sb-panel">
+        <div class="sb-title">התפלגות</div>
+        <div class="dist-row">
+          <div class="dist-lbl" style="color:var(--buy)">קנה</div>
+          <div class="dist-track"><div class="dist-fill buy" id="db" style="width:0%"></div></div>
+          <div class="dist-cnt" style="color:var(--buy)" id="cb">0</div>
+        </div>
+        <div class="dist-row">
+          <div class="dist-lbl" style="color:var(--sell)">מכור</div>
+          <div class="dist-track"><div class="dist-fill sell" id="ds" style="width:0%"></div></div>
+          <div class="dist-cnt" style="color:var(--sell)" id="cs">0</div>
+        </div>
+        <div class="dist-row">
+          <div class="dist-lbl" style="color:var(--wait)">המתן</div>
+          <div class="dist-track"><div class="dist-fill wait" id="dw" style="width:0%"></div></div>
+          <div class="dist-cnt" style="color:var(--wait)" id="cw">0</div>
+        </div>
+      </div>
+      <div class="sb-panel">
+        <div class="sb-title">כיוון שוק</div>
+        <div class="regime-box">
+          <div class="regime-lbl">מגמה נוכחית</div>
+          <div class="regime-val" id="regime-sb" style="color:var(--t2)">–</div>
+          <div class="regime-sub" id="regime-sub-sb">ממתין לנתונים</div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-col">
+      <div class="filter-row">
+        <div class="search-wrap">
+          <span class="search-ico">🔍</span>
+          <input class="search-inp" type="search" id="srch" placeholder="חפש מטבע או כותרת…" oninput="applyFilters()"/>
+        </div>
+        <div class="fpills">
+          <button class="fpill a-all" onclick="setF('ALL',this)">הכל</button>
+          <button class="fpill" onclick="setF('BUY',this)">קנה</button>
+          <button class="fpill" onclick="setF('SELL',this)">מכור</button>
+          <button class="fpill" onclick="setF('WAIT',this)">המתן</button>
+        </div>
+        <div class="row-cnt" id="rcnt">– איתותים</div>
+      </div>
+
+      <div id="signals-container" style="display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:calc(100vh - 320px)">
+        <div class="empty" style="padding:3rem">
+          <div class="empty-ico">◈</div>
+          <div class="spinner" style="margin:0 auto .8rem"></div>
+          <div class="empty-txt">טוען נתונים…</div>
+        </div>
+      </div>
+
+      <div class="log-panel">
+        <div class="log-hdr" onclick="toggleLog()">
+          <span class="log-hdr-title">⬡ יומן מערכת</span>
+          <span class="log-toggle" id="log-toggle">▼ פתח</span>
+          <button class="log-refresh" onclick="event.stopPropagation();loadLogs()">⟳</button>
+        </div>
+        <div class="log-body" id="log-body">
+          <div class="log-lines" id="log-lines">
+            <span class="log-line">— פעילות המערכת תופיע כאן —</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEWS PAGE -->
+<div class="page" id="page-news">
+  <div class="news-page-wrap">
+    <div class="news-header">
+      <div class="news-title">🔥 חדשות חמות</div>
+      <span class="news-count" id="news-count">טוען…</span>
+      <button class="news-refresh-btn" onclick="loadNews()">⟳ רענן</button>
+    </div>
+
+    <div class="news-src-filter" id="news-src-filter">
+      <button class="news-pill active" data-src="ALL" onclick="setNewsSrc('ALL',this)">הכל</button>
+    </div>
+
+    <div class="news-grid" id="news-grid">
+      <div style="grid-column:1/-1;text-align:center;padding:3rem">
+        <div class="spinner" style="margin:0 auto 1rem"></div>
+        <div class="empty-txt">טוען חדשות…</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /shell -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── State ──
+let allSig=[], activeF='ALL', logOpen=false;
+let allNews=[], activeNewsSrc='ALL';
+
+// ── Clock ──
+function tick(){
+  const u=new Date().toUTCString().split(' ')[4];
+  document.getElementById('clk').innerHTML='UTC <b>'+u+'</b>';
+}
+tick(); setInterval(tick,1000);
+
+// ── Page navigation ──
+function showPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('nav-'+page).classList.add('active');
+  if(page==='news' && allNews.length===0) loadNews();
+}
+
+// ── Toast ──
+function toast(m){
+  const t=document.getElementById('toast');
+  t.textContent=m; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ── Helpers ──
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function sigBadge(s){
+  const map={BUY:['buy','קנה'],SELL:['sell','מכור'],WAIT:['wait','המתן']};
+  const [cls,lbl]=map[s]||['wait','המתן'];
+  return '<span class="badge b-'+cls+'"><span class="bdot"></span>'+lbl+'</span>';
+}
+function senBadge(s){
+  const map={Positive:['pos','חיובי'],Negative:['neg','שלילי'],Neutral:['neu','נייטרלי']};
+  const [cls,lbl]=map[s]||['neu','נייטרלי'];
+  return '<span class="badge b-'+cls+'">'+lbl+'</span>';
+}
+function srcBadge(s){
+  const m={CryptoPanic:['cp','CP'],Cointelegraph:['ct','CT'],'The Block':['tb','TB'],Decrypt:['dc','DC']};
+  const [cls,abbr]=m[s]||['uk',s?s.slice(0,2).toUpperCase():'?'];
+  return '<span class="src-b s-'+cls+'" title="'+esc(s)+'">'+abbr+'</span>';
+}
+function fmtTime(ts){
+  if(!ts)return '–';
+  try{return new Date(ts.replace(' ','T')+'Z').toLocaleTimeString('he-IL',{hour12:false,timeZone:'Asia/Jerusalem'});}
+  catch{return ts;}
+}
+
+// ── Render signals table ──
+function renderCards(sigs){
+  const container=document.getElementById('signals-container');
+  document.getElementById('rcnt').textContent=sigs.length+' איתותים';
+  if(!sigs.length){
+    container.innerHTML='<div class="empty"><div class="empty-ico">◈</div><div class="empty-txt">אין איתותים תואמים</div></div>';
+    return;
+  }
+  const dirClass={'ארוך':'long','קצר':'short','המתן':'wait'};
+  const cardClass={BUY:'card-buy',SELL:'card-sell',WAIT:'card-wait'};
+  container.innerHTML=sigs.map((s,i)=>{
+    const dc=dirClass[s.direction]||'wait';
+    const cc=cardClass[s.signal]||'card-wait';
+    const lev=s.leverage&&s.leverage!=='NA'?s.leverage:'x10';
+    const entry=s.entry&&s.entry!=='NA'?'$'+esc(s.entry):'–';
+    const sl=s.stop_loss&&s.stop_loss!=='NA'?'$'+esc(s.stop_loss):'–';
+    const t1=s.target1&&s.target1!=='NA'?'$'+esc(s.target1):'–';
+    const t2=s.target2&&s.target2!=='NA'?'$'+esc(s.target2):'–';
+    const t3=s.target3&&s.target3!=='NA'?'$'+esc(s.target3):'–';
+    return '<div class="sig-card '+cc+'" style="animation-delay:'+(i*0.05)+'s">'
+      // Header
+      +'<div class="sig-card-header">'
+        +'<span class="sig-pair">'+esc(s.symbol||'CRYPTO/USDT')+'</span>'
+        +'<span class="sig-direction dir-'+dc+'">'+(s.direction||'המתן')+'</span>'
+      +'</div>'
+      // Headline
+      +'<div style="font-size:.78rem;color:var(--t1);margin-bottom:10px;font-weight:300;direction:ltr;text-align:left" title="'+esc(s.news_title)+'">'+esc(s.news_title.length>90?s.news_title.slice(0,90)+'…':s.news_title)+'</div>'
+      // Fields grid
+      +'<div class="sig-grid">'
+        +'<div class="sig-field"><div class="sig-field-lbl">כניסה</div><div class="sig-field-val" style="color:var(--neon)">'+entry+'</div></div>'
+        +'<div class="sig-field"><div class="sig-field-lbl">סטופ לוס</div><div class="sig-field-val" style="color:var(--sell)">'+sl+'</div></div>'
+        +'<div class="sig-field"><div class="sig-field-lbl">מינוף</div><div class="sig-field-val" style="color:var(--wait)">'+esc(lev)+'</div></div>'
+        +'<div class="sig-field"><div class="sig-field-lbl">סנטימנט</div><div class="sig-field-val" style="font-size:.7rem;font-family:Heebo">'+esc(s.sentiment||'נייטרלי')+'</div></div>'
+      +'</div>'
+      // Targets
+      +'<div class="sig-targets">'
+        +'<div class="sig-target"><div class="sig-target-lbl">מטרה 1</div><div class="sig-target-val">'+t1+'</div></div>'
+        +'<div class="sig-target"><div class="sig-target-lbl">מטרה 2</div><div class="sig-target-val">'+t2+'</div></div>'
+        +'<div class="sig-target"><div class="sig-target-lbl">מטרה 3</div><div class="sig-target-val">'+t3+'</div></div>'
+      +'</div>'
+      // Footer
+      +'<div class="sig-footer">'
+        +'<div class="sig-reason" title="'+esc(s.reason)+'">💡 '+esc(s.reason)+'</div>'
+        +'<div class="sig-meta">'
+          +'<span class="sig-src">'+esc(s.source||'')+'</span>'
+          +'<span class="sig-time">'+fmtTime(s.timestamp)+'</span>'
+        +'</div>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+function renderTable(sigs){ renderCards(sigs); }
+
+function updateSidebar(sigs){
+  const total=sigs.length||1;
+  const bc=sigs.filter(s=>s.signal==='BUY').length;
+  const sc=sigs.filter(s=>s.signal==='SELL').length;
+  const wc=sigs.filter(s=>s.signal==='WAIT').length;
+  document.getElementById('cb').textContent=bc;
+  document.getElementById('cs').textContent=sc;
+  document.getElementById('cw').textContent=wc;
+  document.getElementById('db').style.width=(bc/total*100)+'%';
+  document.getElementById('ds').style.width=(sc/total*100)+'%';
+  document.getElementById('dw').style.width=(wc/total*100)+'%';
+  const rv=document.getElementById('regime-hero');
+  const rs=document.getElementById('regime-sub-hero');
+  const rv2=document.getElementById('regime-sb');
+  const rs2=document.getElementById('regime-sub-sb');
+  let regime,color;
+  if(bc>sc&&bc>wc){regime='שוורי 📈';color='var(--buy)'}
+  else if(sc>bc&&sc>wc){regime='דובי 📉';color='var(--sell)'}
+  else{regime='נייטרלי ⚖️';color='var(--wait)'}
+  rv.textContent=rv2.textContent=regime;
+  rv.style.color=rv2.style.color=color;
+  rs.textContent=rs2.textContent=bc+' קנה / '+sc+' מכור / '+wc+' המתן';
+}
+
+function setF(val,btn){
+  activeF=val;
+  document.querySelectorAll('.fpill').forEach(p=>p.className='fpill');
+  const m={ALL:'a-all',BUY:'a-buy',SELL:'a-sell',WAIT:'a-wait'};
+  btn.classList.add(m[val]||'a-all');
+  applyFilters();
+}
+function applyFilters(){
+  const q=document.getElementById('srch').value.toLowerCase().trim();
+  let f=allSig;
+  if(activeF!=='ALL')f=f.filter(s=>s.signal===activeF);
+  if(q)f=f.filter(s=>s.symbol.toLowerCase().includes(q)||s.news_title.toLowerCase().includes(q)||(s.reason||'').toLowerCase().includes(q));
+  renderTable(f);
+}
+
+async function loadSignals(){
+  try{
+    const [r1,r2]=await Promise.all([fetch('/api/signals'),fetch('/api/stats')]);
+    allSig=await r1.json();
+    const st=await r2.json();
+    document.getElementById('s-today').textContent=st.today;
+    document.getElementById('prog-fill').style.width=Math.min(100,st.today/st.daily_limit*100)+'%';
+    document.getElementById('s-rem-sub').textContent=st.remaining+' נותרו';
+    document.getElementById('s-total').textContent=allSig.length;
+    document.getElementById('s-sync').textContent=new Date().toLocaleTimeString('he-IL',{hour12:false,timeZone:'Asia/Jerusalem'});
+    updateSidebar(allSig);
+    applyFilters();
+  }catch(e){
+    console.error(e);
+    toast('⚠ שגיאה בטעינת נתונים');
+  }
+}
+
+async function triggerJob(){
+  const btn=document.getElementById('trig-btn');
+  btn.disabled=true;btn.textContent='⏳ סורק…';
+  try{
+    const r=await fetch('/api/trigger',{method:'POST'});
+    if(r.ok){toast('✓ סריקה הושלמה — מרענן בעוד 5 שניות');setTimeout(()=>{loadSignals();loadLogs();},5000);}
+    else toast('⚠ הסריקה נכשלה');
+  }catch{toast('⚠ שגיאת רשת');}
+  finally{btn.disabled=false;btn.textContent='▶ סריקה';}
+}
+
+// ── Log viewer ──
+function toggleLog(){
+  logOpen=!logOpen;
+  document.getElementById('log-body').classList.toggle('open',logOpen);
+  document.getElementById('log-toggle').textContent=logOpen?'▲ סגור':'▼ פתח';
+  if(logOpen)loadLogs();
+}
+async function loadLogs(){
+  try{
+    const r=await fetch('/api/logs');
+    const d=await r.json();
+    const el=document.getElementById('log-lines');
+    el.innerHTML=(d.lines||[]).map(line=>{
+      let cls='';
+      if(/\[ERROR/.test(line))cls='err';
+      else if(/\[WARNING/.test(line))cls='warn';
+      else if(/\[BUY\]|\[SELL\]|\[WAIT\]/.test(line))cls='new-sig';
+      return '<span class="log-line '+cls+'">'+esc(line)+'</span>';
+    }).join('');
+    el.scrollTop=el.scrollHeight;
+  }catch(e){console.warn(e)}
+}
+
+// ── NEWS PAGE ──
+const SRC_COLORS={
+  'CoinDesk':'#f59e0b','Cointelegraph':'#00c8f0',
+  'Bitcoin.com':'#f97316','CryptoSlate':'#a78bfa','NewsBTC':'#34d399'
+};
+const SRC_CLASS={
+  'CoinDesk':'coindesk','Cointelegraph':'cointelegraph',
+  'Bitcoin.com':'bitcoincom','CryptoSlate':'cryptoslate','NewsBTC':'newsbtc'
+};
+
+function setNewsSrc(src,btn){
+  activeNewsSrc=src;
+  document.querySelectorAll('.news-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  renderNews();
+}
+
+function renderNews(){
+  const grid=document.getElementById('news-grid');
+  let items=allNews;
+  if(activeNewsSrc!=='ALL') items=items.filter(n=>n.source===activeNewsSrc);
+  document.getElementById('news-count').textContent=items.length+' חדשות';
+  if(!items.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:3rem"><div class="empty-txt">אין חדשות להצגה</div></div>';
+    return;
+  }
+  grid.innerHTML=items.map((n,i)=>{
+    const color=SRC_COLORS[n.source]||'#6b8fb5';
+    const isHot=i<10;
+    return '<div class="news-card" style="animation-delay:'+(i*0.04)+'s">'
+      +'<div class="news-card-src">'
+        +'<div class="news-src-dot" style="background:'+color+';box-shadow:0 0 6px '+color+'"></div>'
+        +'<div class="news-src-name">'+esc(n.source)+'</div>'
+        +(isHot?'<span class="news-hot-badge">🔥 חם</span>':'')
+      +'</div>'
+      +'<div class="news-card-title">'+esc(n.title)+'</div>'
+      +'<div class="news-card-footer">'
+        +'<button class="news-analyze-btn" onclick="analyzeNews(this,\''+esc(n.title).replace(/'/g,"\\'")+'\')">⚡ נתח</button>'
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+async function loadNews(){
+  document.getElementById('news-grid').innerHTML=
+    '<div style="grid-column:1/-1;text-align:center;padding:3rem"><div class="spinner" style="margin:0 auto 1rem"></div><div class="empty-txt">טוען חדשות…</div></div>';
+  try{
+    const r=await fetch('/api/news');
+    allNews=await r.json();
+    // Build source filter pills
+    const sources=[...new Set(allNews.map(n=>n.source))];
+    const filterEl=document.getElementById('news-src-filter');
+    filterEl.innerHTML='<button class="news-pill active" data-src="ALL" onclick="setNewsSrc(\'ALL\',this)">הכל</button>'
+      +sources.map(s=>'<button class="news-pill" onclick="setNewsSrc(\''+esc(s)+'\',this)">'+esc(s)+'</button>').join('');
+    renderNews();
+  }catch(e){
+    console.error(e);
+    document.getElementById('news-grid').innerHTML=
+      '<div style="grid-column:1/-1;text-align:center;padding:3rem"><div class="empty-txt" style="color:var(--sell)">⚠ שגיאה בטעינת חדשות</div></div>';
+    toast('⚠ שגיאה בטעינת חדשות');
+  }
+}
+
+async function analyzeNews(btn, title){
+  btn.disabled=true;btn.textContent='⏳…';
+  try{
+    await fetch('/api/trigger',{method:'POST'});
+    toast('✓ נשלח לניתוח AI — בדוק לוח בקרה בעוד 30 שניות');
+    setTimeout(loadSignals,30000);
+  }catch{toast('⚠ שגיאה בשליחה');}
+  finally{btn.disabled=false;btn.textContent='⚡ נתח';}
+}
+
+// Boot
+loadSignals();
+setInterval(loadSignals,120000);
+setInterval(()=>{if(logOpen)loadLogs();},30000);
+</script>
+</body>
+</html>
