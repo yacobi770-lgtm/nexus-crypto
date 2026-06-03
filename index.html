@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NEXUS — Futures Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Hebrew:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  /* Light mode — professional & clean */
+  --bg:#f5f7fa;
+  --bg2:#ffffff;
+  --bg3:#f0f3f8;
+  --bg4:#e8ecf3;
+  --line:#e2e8f0;
+  --line2:#cbd5e1;
+  --line3:#94a3b8;
+  --txt:#0f172a;
+  --txt2:#475569;
+  --txt3:#94a3b8;
+  --blue:#2563eb;
+  --blue2:rgba(37,99,235,.1);
+  --blue3:rgba(37,99,235,.06);
+  --green:#059669;
+  --green2:rgba(5,150,105,.1);
+  --green3:rgba(5,150,105,.06);
+  --red:#dc2626;
+  --red2:rgba(220,38,38,.1);
+  --red3:rgba(220,38,38,.06);
+  --yellow:#d97706;
+  --yellow2:rgba(217,119,6,.1);
+  --yellow3:rgba(217,119,6,.06);
+  --purple:#7c3aed;
+  --purple2:rgba(124,58,237,.1);
+  --mono:'JetBrains Mono',monospace;
+  --ui:'Inter',sans-serif;
+  --he:'Noto Sans Hebrew','Inter',sans-serif;
+  --r:6px;--r2:10px;--r3:14px;
+  --shadow:0 1px 3px rgba(15,23,42,.06),0 4px 12px rgba(15,23,42,.08);
+  --shadow2:0 4px 16px rgba(15,23,42,.1),0 12px 40px rgba(15,23,42,.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{background:var(--bg);color:var(--txt);font-family:var(--he);min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.app{display:flex;flex-direction:column;min-height:100vh}
+
+/* ══ TOPBAR ══ */
+.top{
+  height:54px;display:flex;align-items:center;gap:6px;padding:0 18px;
+  background:#fff;border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:900;
+  box-shadow:0 1px 0 var(--line),0 2px 16px rgba(15,23,42,.04);
+}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;margin-left:10px}
+.logo-icon{
+  width:30px;height:30px;border-radius:7px;flex-shrink:0;
+  background:linear-gradient(135deg,#2563eb,#3b82f6);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:.6rem;font-weight:500;color:#fff;
+  box-shadow:0 2px 8px rgba(37,99,235,.35);
+}
+.logo-name{font-family:var(--ui);font-size:.9rem;font-weight:700;letter-spacing:.06em;color:var(--txt)}
+.logo-sub{font-family:var(--mono);font-size:.36rem;color:var(--blue);letter-spacing:.2em;opacity:.7;display:block}
+.nav{display:flex;gap:1px;padding:2px;background:var(--bg3);border:1px solid var(--line);border-radius:7px}
+.np{font-family:var(--mono);font-size:.47rem;letter-spacing:.07em;text-transform:uppercase;color:var(--txt3);background:transparent;border:none;padding:.24rem .58rem;border-radius:5px;cursor:pointer;transition:all .12s;text-decoration:none;white-space:nowrap}
+.np:hover{color:var(--txt2);background:var(--bg4)}
+.np.on{color:var(--blue);background:#fff;font-weight:600;box-shadow:0 1px 3px rgba(15,23,42,.08)}
+.sp{flex:1}
+.live-pill{display:flex;align-items:center;gap:4px;padding:.18rem .52rem;border-radius:20px;background:var(--green3);border:1px solid rgba(5,150,105,.2)}
+.live-d{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+.live-t{font-family:var(--mono);font-size:.44rem;color:var(--green);letter-spacing:.1em}
+.clk{font-family:var(--mono);font-size:.5rem;color:var(--txt3);background:var(--bg3);border:1px solid var(--line);padding:.18rem .5rem;border-radius:5px}
+.hbtn{width:28px;height:28px;background:transparent;border:1px solid var(--line);border-radius:5px;color:var(--txt3);cursor:pointer;font-size:.75rem;transition:all .12s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hbtn:hover{color:var(--txt);border-color:var(--line2);background:var(--bg3);box-shadow:var(--shadow)}
+.scan-btn{font-family:var(--ui);font-size:.68rem;font-weight:600;background:var(--blue);border:none;color:#fff;padding:.26rem .82rem;border-radius:var(--r);cursor:pointer;transition:all .13s;white-space:nowrap;box-shadow:0 2px 10px rgba(37,99,235,.3)}
+.scan-btn:hover:not(:disabled){background:#1d4ed8;box-shadow:0 4px 16px rgba(37,99,235,.4);transform:translateY(-1px)}
+.scan-btn:active{transform:none}
+.scan-btn:disabled{opacity:.4;cursor:default;transform:none}
+
+/* ══ PAGES ══ */
+.page{display:none;flex:1;flex-direction:column}
+.page.on{display:flex}
+
+/* ══ DASHBOARD ══ */
+.dash{padding:16px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media(min-width:480px){.stats{grid-template-columns:repeat(4,1fr)}}
+.sc{background:#fff;border:1px solid var(--line);border-radius:var(--r2);padding:13px 15px;position:relative;overflow:hidden;transition:all .15s;box-shadow:var(--shadow)}
+.sc:hover{border-color:var(--line2);transform:translateY(-1px);box-shadow:var(--shadow2)}
+.sc-accent{position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--r2) var(--r2) 0 0}
+.sc-b .sc-accent{background:linear-gradient(90deg,#2563eb,#60a5fa)}
+.sc-g .sc-accent{background:linear-gradient(90deg,#059669,#34d399)}
+.sc-y .sc-accent{background:linear-gradient(90deg,#d97706,#fbbf24)}
+.sc-p .sc-accent{background:linear-gradient(90deg,#7c3aed,#a78bfa)}
+.sc-r .sc-accent{background:linear-gradient(90deg,#dc2626,#f87171)}
+.sc-lbl{font-family:var(--mono);font-size:.4rem;letter-spacing:.16em;color:var(--txt3);text-transform:uppercase;margin-bottom:6px}
+.sc-val{font-family:var(--ui);font-size:1.85rem;font-weight:700;line-height:1;letter-spacing:-.02em}
+.sc-sub{font-size:.6rem;color:var(--txt3);margin-top:4px}
+.sc-bar{height:2px;background:var(--line);border-radius:1px;margin-top:8px;overflow:hidden}
+.sc-bar-i{height:100%;border-radius:1px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+
+/* Breaking */
+.ticker-bar{background:#fff8f0;border:1px solid rgba(220,38,38,.18);border-radius:var(--r);padding:7px 12px;display:none;align-items:center;gap:8px;overflow:hidden;box-shadow:var(--shadow)}
+.ticker-bar.on{display:flex}
+.ticker-tag{font-family:var(--mono);font-size:.42rem;letter-spacing:.14em;color:var(--red);background:var(--red2);border:1px solid rgba(220,38,38,.2);padding:.08rem .35rem;border-radius:3px;white-space:nowrap;flex-shrink:0;animation:pr 1.2s infinite}
+@keyframes pr{0%,100%{opacity:1}50%{opacity:.4}}
+.ticker-scroll{flex:1;overflow:hidden}
+.ticker-txt{font-size:.7rem;color:var(--txt);white-space:nowrap;animation:tscroll 40s linear infinite;display:inline-block}
+@keyframes tscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* WR Banner */
+.wr-bar{background:#fff;border:1px solid var(--line);border-radius:var(--r2);padding:10px 14px;display:none;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:var(--shadow)}
+.wr-bar.on{display:flex}
+.wr-num{font-family:var(--ui);font-size:1.55rem;font-weight:700;letter-spacing:-.02em}
+.wr-sep{width:1px;height:22px;background:var(--line)}
+.wr-g{display:flex;flex-direction:column;gap:1px}
+.wr-l{font-family:var(--mono);font-size:.38rem;color:var(--txt3);letter-spacing:.13em;text-transform:uppercase}
+.wr-v{font-family:var(--ui);font-size:.8rem;font-weight:600}
+.sess-pill{font-family:var(--mono);font-size:.42rem;padding:.14rem .4rem;border-radius:4px;border:1px solid;letter-spacing:.06em;margin-right:auto}
+.risk-pill{font-family:var(--mono);font-size:.4rem;padding:.12rem .38rem;border-radius:4px;background:var(--red3);border:1px solid rgba(220,38,38,.18);color:var(--red)}
+
+/* Controls */
+.ctrl{background:#fff;border:1px solid var(--line);border-radius:var(--r2);padding:9px 13px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;box-shadow:var(--shadow)}
+.search{flex:1;min-width:120px;max-width:195px;background:var(--bg3);border:1px solid var(--line);border-radius:5px;color:var(--txt);font-family:var(--he);font-size:.78rem;padding:.3rem .6rem;outline:none;transition:all .15s}
+.search::placeholder{color:var(--txt3)}
+.search:focus{border-color:rgba(37,99,235,.4);background:#fff;box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.chips{display:flex;gap:3px}
+.chip{font-family:var(--mono);font-size:.45rem;letter-spacing:.06em;padding:.2rem .44rem;border-radius:4px;border:1px solid var(--line);background:transparent;color:var(--txt3);cursor:pointer;transition:all .11s}
+.chip:hover{color:var(--txt2);border-color:var(--line2);background:var(--bg3)}
+.chip.ca{color:var(--blue);background:var(--blue2);border-color:rgba(37,99,235,.25)}
+.chip.cg{color:var(--green);background:var(--green2);border-color:rgba(5,150,105,.22)}
+.chip.cr{color:var(--red);background:var(--red2);border-color:rgba(220,38,38,.22)}
+.chip.cy{color:var(--yellow);background:var(--yellow2);border-color:rgba(217,119,6,.2)}
+.sort-s{font-family:var(--mono);font-size:.45rem;color:var(--txt2);background:var(--bg3);border:1px solid var(--line);border-radius:4px;padding:.2rem .44rem;cursor:pointer;outline:none}
+.sig-cnt{font-family:var(--mono);font-size:.46rem;color:var(--txt3);margin-right:auto}
+
+/* ══ SIGNAL CARDS ══ */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(286px,1fr));gap:10px}
+@media(min-width:950px){.grid{grid-template-columns:repeat(3,1fr)}}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r2);overflow:hidden;display:flex;flex-direction:column;transition:all .16s;animation:fu .2s ease both;box-shadow:var(--shadow)}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow2);border-color:var(--line2)}
+.card.buy{border-top:3px solid var(--green)}
+.card.sell{border-top:3px solid var(--red)}
+.card.wait{border-top:3px solid var(--yellow)}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* card sections */
+.ch{display:flex;align-items:center;justify-content:space-between;padding:11px 13px 8px;border-bottom:1px solid var(--line)}
+.csym{font-family:var(--ui);font-size:.95rem;font-weight:700}
+.badges{display:flex;gap:3px;align-items:center}
+.dbadge{font-family:var(--mono);font-size:.45rem;font-weight:500;padding:.1rem .34rem;border-radius:3px;letter-spacing:.05em}
+.dl{background:var(--green2);color:var(--green);border:1px solid rgba(5,150,105,.2)}
+.ds{background:var(--red2);color:var(--red);border:1px solid rgba(220,38,38,.2)}
+.dw{background:var(--yellow2);color:var(--yellow);border:1px solid rgba(217,119,6,.18)}
+.sbadge{font-family:var(--mono);font-size:.48rem;font-weight:600;padding:.1rem .36rem;border-radius:3px;border:1px solid}
+.sh{background:var(--green2);color:var(--green);border-color:rgba(5,150,105,.2)}
+.sm{background:var(--blue2);color:var(--blue);border-color:rgba(37,99,235,.2)}
+.sl{background:var(--yellow2);color:var(--yellow);border-color:rgba(217,119,6,.18)}
+.cbadge{font-family:var(--mono);font-size:.42rem;color:var(--txt3);background:var(--bg3);border:1px solid var(--line);padding:.07rem .28rem;border-radius:3px}
+.fstrip{padding:4px 13px;background:var(--blue3);border-bottom:1px solid rgba(37,99,235,.1);display:flex;align-items:center;gap:7px}
+.ftag{font-family:var(--mono);font-size:.4rem;color:var(--blue);letter-spacing:.12em;border:1px solid rgba(37,99,235,.2);padding:.04rem .28rem;border-radius:3px}
+.flev{font-family:var(--mono);font-size:.42rem;color:var(--txt3)}
+.fliq{font-family:var(--mono);font-size:.42rem;color:var(--red);margin-right:auto;font-weight:500}
+.chl{padding:8px 13px;font-size:.71rem;color:var(--txt2);line-height:1.5;direction:rtl;border-bottom:1px solid var(--line);background:var(--bg3)}
+.pg{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line)}
+.pf{background:var(--bg3);padding:8px 11px}
+.pfl{font-family:var(--mono);font-size:.38rem;letter-spacing:.13em;color:var(--txt3);text-transform:uppercase;margin-bottom:2px}
+.pfv{font-family:var(--mono);font-size:.72rem;font-weight:500}
+.tg{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line)}
+.tc{background:#f0f7ff;padding:7px 10px;text-align:center;transition:background .12s}
+.tc:hover{background:#dbeafe}
+.tl{font-family:var(--mono);font-size:.37rem;color:var(--blue);letter-spacing:.08em;margin-bottom:2px;opacity:.7}
+.tv{font-family:var(--mono);font-size:.66rem;color:var(--blue);font-weight:500}
+.tvz{height:130px;cursor:pointer;position:relative;overflow:hidden;border-top:1px solid var(--line);background:var(--bg3)}
+.tvz iframe{width:100%;height:100%;border:none}
+.tvph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:background .14s}
+.tvph:hover{background:rgba(37,99,235,.05)}
+.tvpi{font-size:1rem;opacity:.12}
+.tvpt{font-family:var(--mono);font-size:.43rem;color:var(--txt3);letter-spacing:.1em}
+.rbox{padding:8px 13px;background:#fffbeb;border-top:1px solid rgba(217,119,6,.12);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ri{display:flex;flex-direction:column;gap:1px}
+.rl{font-family:var(--mono);font-size:.37rem;color:var(--txt3);letter-spacing:.11em;text-transform:uppercase}
+.rv{font-family:var(--ui);font-size:.78rem;font-weight:600}
+.rdiv{width:1px;height:18px;background:rgba(217,119,6,.2)}
+.rw{font-size:.62rem;color:var(--yellow);direction:rtl;width:100%}
+.creason{padding:8px 13px;font-size:.69rem;color:var(--txt2);line-height:1.6;direction:rtl;border-top:1px solid var(--line)}
+.cfoot{display:flex;align-items:center;padding:6px 13px;border-top:1px solid var(--line);background:var(--bg3);gap:5px;flex-wrap:wrap}
+.fsrc{font-family:var(--mono);font-size:.4rem;color:var(--txt3)}
+.ftime{font-family:var(--mono);font-size:.4rem;color:var(--txt3);margin-right:auto}
+.rbadge{font-family:var(--mono);font-size:.4rem;padding:.06rem .28rem;border-radius:3px}
+.ro{background:var(--bg4);color:var(--txt3);border:1px solid var(--line)}
+.rh{background:var(--green2);color:var(--green);border:1px solid rgba(5,150,105,.18)}
+.rs{background:var(--red2);color:var(--red);border:1px solid rgba(220,38,38,.18)}
+.pbtn{font-family:var(--mono);font-size:.4rem;padding:.06rem .3rem;border-radius:3px;border:1px solid rgba(37,99,235,.2);background:var(--blue3);color:var(--blue);cursor:pointer;transition:all .11s}
+.pbtn:hover{background:var(--blue2)}
+.empty{grid-column:1/-1;text-align:center;padding:4rem 2rem;background:#fff;border:1px solid var(--line);border-radius:var(--r2);box-shadow:var(--shadow)}
+.spin{width:20px;height:20px;border:2px solid var(--line2);border-top-color:var(--blue);border-radius:50%;animation:sp .6s linear infinite;display:inline-block;margin-bottom:10px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.etxt{font-family:var(--mono);font-size:.52rem;color:var(--txt3);letter-spacing:.12em}
+.lupd{text-align:center;font-family:var(--mono);font-size:.4rem;color:var(--txt3);opacity:.5;padding:5px;grid-column:1/-1}
+
+/* ══ NEWS ══ */
+.nwrap{padding:16px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+.phdr{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.ptitle{font-family:var(--ui);font-size:1rem;font-weight:700}
+.ptag{font-family:var(--mono);font-size:.42rem;color:var(--txt2);background:#fff;border:1px solid var(--line);padding:.13rem .38rem;border-radius:3px;box-shadow:var(--shadow)}
+.catbar{display:flex;gap:3px;flex-wrap:wrap}
+.hotbar{background:#fff;border:1px solid rgba(220,38,38,.15);border-radius:var(--r2);padding:10px 13px;display:none;box-shadow:var(--shadow)}
+.hotbar.on{display:block}
+.hotl{font-family:var(--mono);font-size:.4rem;color:var(--red);letter-spacing:.16em;text-transform:uppercase;margin-bottom:6px}
+.hoti{display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid var(--line)}
+.hoti:last-child{border-bottom:none}
+.hoth{font-family:var(--mono);font-size:.5rem;min-width:24px}
+.hottt{font-size:.7rem;color:var(--txt);direction:rtl;flex:1;line-height:1.4}
+.ngrid{display:grid;grid-template-columns:1fr;gap:8px}
+@media(min-width:550px){.ngrid{grid-template-columns:repeat(2,1fr)}}
+@media(min-width:900px){.ngrid{grid-template-columns:repeat(3,1fr)}}
+.nc{background:#fff;border:1px solid var(--line);border-radius:var(--r2);padding:12px 14px;display:flex;flex-direction:column;gap:7px;animation:fu .2s ease both;transition:all .13s;box-shadow:var(--shadow)}
+.nc:hover{border-color:var(--line2);transform:translateY(-1px);box-shadow:var(--shadow2)}
+.ncm{display:flex;align-items:center;gap:5px}
+.ncd{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.ncs{font-family:var(--mono);font-size:.41rem;color:var(--txt3)}
+.nccat{font-family:var(--mono);font-size:.4rem;padding:.05rem .26rem;border-radius:3px}
+.nchb{height:2px;background:var(--line);border-radius:1px;overflow:hidden}
+.nchi{height:100%;border-radius:1px;transition:width .8s}
+.ncht{font-size:.78rem;color:var(--txt);direction:rtl;line-height:1.5;font-weight:500}
+.ncte{font-size:.62rem;color:var(--txt3);direction:ltr;text-align:left;line-height:1.4}
+.edu{border-radius:6px;padding:8px 10px;direction:rtl}
+.edulbl{font-family:var(--mono);font-size:.38rem;letter-spacing:.1em;margin-bottom:3px;text-transform:uppercase;font-weight:500}
+.edutxt{font-size:.69rem;color:var(--txt);line-height:1.5}
+.ncbtns{display:flex;gap:4px}
+.nb{font-family:var(--mono);font-size:.44rem;letter-spacing:.06em;padding:.16rem .42rem;border-radius:4px;border:1px solid;cursor:pointer;transition:all .11s}
+.nb-s{color:var(--blue);border-color:rgba(37,99,235,.2);background:var(--blue3)}
+.nb-s:hover{background:var(--blue2)}
+.nb-e{color:var(--purple);border-color:rgba(124,58,237,.2);background:var(--purple2)}
+.nb-e:hover{background:rgba(124,58,237,.18)}
+
+/* ══ SHARED ══ */
+.gwrap{padding:16px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+.gcard{background:#fff;border:1px solid var(--line);border-radius:var(--r2);padding:14px 16px;box-shadow:var(--shadow)}
+.grow{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:9px 13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;transition:all .12s;box-shadow:var(--shadow)}
+.grow:hover{border-color:var(--line2);box-shadow:var(--shadow2)}
+.gempty{text-align:center;padding:3rem;background:#fff;border:1px solid var(--line);border-radius:var(--r2);box-shadow:var(--shadow)}
+
+/* ══ PRICES ══ */
+.prwrap{padding:16px 18px;display:flex;flex-direction:column;gap:10px;flex:1}
+.qabox{background:#fff;border:1px solid var(--line);border-radius:var(--r2);padding:14px 16px;display:none;box-shadow:var(--shadow)}
+.qabox.on{display:block}
+.pmini{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;cursor:pointer;transition:all .13s;position:relative;box-shadow:var(--shadow)}
+.pmini:hover{border-color:var(--line2);transform:translateY(-1px);box-shadow:var(--shadow2)}
+.pmcoin{font-family:var(--ui);font-size:.78rem;font-weight:700;margin-bottom:3px;color:var(--txt)}
+.pmprice{font-family:var(--mono);font-size:.7rem;font-weight:500}
+.pmsig{font-family:var(--mono);font-size:.39rem;margin-top:2px}
+.pmdot{position:absolute;top:5px;left:5px;width:4px;height:4px;border-radius:50%}
+
+/* ══ TOAST ══ */
+.toast{position:fixed;bottom:16px;right:16px;z-index:9999;background:#fff;border:1px solid var(--line2);border-left:3px solid var(--blue);color:var(--blue);font-family:var(--mono);font-size:.47rem;letter-spacing:.07em;padding:.38rem .78rem;border-radius:var(--r);box-shadow:var(--shadow2);opacity:0;transform:translateY(5px) scale(.97);transition:all .14s;pointer-events:none}
+.toast.on{opacity:1;transform:translateY(0) scale(1)}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg3)}
+::-webkit-scrollbar-thumb{background:var(--line2);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--line3)}
+
+/* Utils */
+.pos{color:var(--green)}.neg{color:var(--red)}.neu{color:var(--txt3)}
+</style>
+</head>
+<body>
+<div class="app">
+<nav class="top">
+  <a class="logo" href="#" onclick="showP('dash');return false">
+    <div class="logo-icon">NX</div>
+    <div><div class="logo-name">NEXUS</div><div class="logo-sub">FUTURES INTELLIGENCE</div></div>
+  </a>
+  <div class="nav">
+    <a class="np on" id="n-dash"   onclick="showP('dash')">⬡ איתותים</a>
+    <a class="np"    id="n-news"   onclick="showP('news')">◈ חדשות</a>
+    <a class="np"    id="n-port"   onclick="showP('port')">◎ פורטפוליו</a>
+    <a class="np"    id="n-perf"   onclick="showP('perf')">▣ ביצועים</a>
+    <a class="np"    id="n-bt"     onclick="showP('bt')">⚙ בקטסט</a>
+    <a class="np"    id="n-prices" onclick="showP('prices')">💹 מחירים</a>
+    <a class="np"    id="n-learn"  onclick="showP('learn')">🧠 למידה</a>
+    <a class="np"    id="n-trade"  onclick="showP('trade')">⚡ Auto-Trade</a>
+  </div>
+  <div class="sp"></div>
+  <div class="live-pill"><div class="live-d"></div><div class="live-t">LIVE</div></div>
+  <div class="clk" id="clk">--:--</div>
+  <button class="hbtn" id="sbtn" onclick="toggleSnd()">🔔</button>
+  <button class="scan-btn" id="scanbtn" onclick="trigJob()">▶ סריקה</button>
+  <button class="hbtn" onclick="loadSigs()" title="רענן">⟳</button>
+</nav>
+
+<!-- DASH -->
+<div class="page on" id="p-dash">
+<div class="dash">
+  <div class="stats">
+    <div class="sc sc-b"><div class="sc-accent"></div><div class="sc-lbl">איתותים היום</div><div class="sc-val" style="color:var(--blue)" id="s-today">–</div><div class="sc-bar"><div class="sc-bar-i" id="prog" style="width:0%;background:linear-gradient(90deg,var(--blue),#60a5fa)"></div></div><div class="sc-sub" id="s-rem">–</div></div>
+    <div class="sc sc-g"><div class="sc-accent"></div><div class="sc-lbl">כיוון שוק</div><div class="sc-val" id="regime" style="font-size:.9rem;color:var(--txt2)">–</div><div class="sc-sub" id="regime-s">ממתין</div></div>
+    <div class="sc sc-y"><div class="sc-accent"></div><div class="sc-lbl">קנה / מכור / המתן</div><div style="display:flex;gap:7px;align-items:baseline;margin-top:4px"><span><span class="sc-val" id="cb" style="color:var(--green);font-size:1.5rem">0</span><span style="font-size:.5rem;color:var(--txt3);margin-right:2px"> ק</span></span><span><span class="sc-val" id="cs" style="color:var(--red);font-size:1.5rem">0</span><span style="font-size:.5rem;color:var(--txt3);margin-right:2px"> מ</span></span><span><span class="sc-val" id="cw" style="color:var(--yellow);font-size:1.5rem">0</span><span style="font-size:.5rem;color:var(--txt3);margin-right:2px"> ה</span></span></div></div>
+    <div class="sc sc-p"><div class="sc-accent"></div><div class="sc-lbl">עדכון אחרון</div><div class="sc-val" id="s-sync" style="font-size:.76rem;font-family:var(--mono)">–</div><div class="sc-sub">שעון ישראל</div></div>
+  </div>
+  <div class="ticker-bar" id="tbar"><span class="ticker-tag">🔴 BREAKING</span><div class="ticker-scroll"><div class="ticker-txt" id="ttxt">–</div></div><button onclick="showP('news')" style="font-family:var(--mono);font-size:.4rem;padding:.08rem .35rem;border-radius:3px;border:1px solid rgba(220,38,38,.2);background:var(--red3);color:var(--red);cursor:pointer;flex-shrink:0">ראה הכל</button></div>
+  <div class="wr-bar" id="wrbar">
+    <div class="wr-g"><div class="wr-l">Win Rate</div><div class="wr-num" id="wrp">–</div></div>
+    <div class="wr-sep"></div>
+    <div class="wr-g"><div class="wr-l">✓ מטרה</div><div class="wr-v pos" id="wrh">0</div></div>
+    <div class="wr-g"><div class="wr-l">✗ סטופ</div><div class="wr-v neg" id="wrs">0</div></div>
+    <div class="wr-sep"></div>
+    <div class="wr-g"><div class="wr-l">שבוע</div><div class="wr-v" style="color:var(--blue)" id="wrw">–%</div></div>
+    <div class="wr-g"><div class="wr-l">PnL ממוצע</div><div class="wr-v" id="wrpnl">–%</div></div>
+    <div class="sess-pill" id="stag">–</div>
+    <div class="wr-g"><div class="wr-l">סיכון פתוח</div><div class="wr-v" id="orisk" style="color:var(--yellow)">0%</div></div>
+    <div class="risk-pill">🛡 מקס׳ 25%</div>
+  </div>
+  <div class="ctrl">
+    <input class="search" type="search" id="srch" placeholder="🔍 חפש מטבע..." oninput="applyF()"/>
+    <div class="chips">
+      <button class="chip ca" onclick="setF('ALL',this)">הכל</button>
+      <button class="chip" onclick="setF('BUY',this)">▲ קנה</button>
+      <button class="chip" onclick="setF('SELL',this)">▼ מכור</button>
+      <button class="chip" onclick="setF('WAIT',this)">◆ המתן</button>
+    </div>
+    <select class="sort-s" onchange="sortBy=this.value;applyF()"><option value="score">ניקוד ↓</option><option value="rr">R/R ↓</option><option value="time">זמן ↓</option></select>
+    <div class="sig-cnt" id="cnt">–</div>
+  </div>
+  <div class="grid" id="cards"><div class="empty"><div class="spin"></div><div class="etxt">טוען איתותים...</div></div></div>
+  <div class="lupd" id="lupd"></div>
+</div></div>
+
+<!-- NEWS -->
+<div class="page" id="p-news">
+<div class="nwrap">
+  <div class="phdr">
+    <div class="ptitle">📡 חדשות ולמידה</div>
+    <span class="ptag" id="ncnt">טוען...</span>
+    <span id="rtind" style="font-family:var(--mono);font-size:.4rem;color:var(--green);background:var(--green3);border:1px solid rgba(5,150,105,.2);padding:.12rem .36rem;border-radius:3px;display:none">🟢 LIVE</span>
+    <button class="hbtn" onclick="loadNews()" style="width:auto;padding:0 8px;font-size:.48rem">⟳</button>
+    <button class="hbtn" onclick="loadRTNews()" style="width:auto;padding:0 8px;font-size:.48rem;color:var(--red)">🔴</button>
+    <button class="hbtn" onclick="bcastNews(this)" style="width:auto;padding:0 8px;font-size:.48rem;color:var(--blue)">✈️</button>
+    <button class="hbtn" onclick="sendTip(this)" style="width:auto;padding:0 8px;font-size:.48rem;color:var(--purple)">📚</button>
+  </div>
+  <div class="catbar">
+    <button class="chip ca" onclick="filterN('ALL',this)">🌐 הכל</button>
+    <button class="chip" onclick="filterN('BTC',this)">₿ BTC</button>
+    <button class="chip" onclick="filterN('ETH',this)">Ξ ETH</button>
+    <button class="chip" onclick="filterN('ALTCOIN',this)">🔷 ALT</button>
+    <button class="chip" onclick="filterN('DeFi',this)">⚡ DeFi</button>
+    <button class="chip" onclick="filterN('REGULATION',this)">⚖️ רגולציה</button>
+    <button class="chip" onclick="filterN('WHALE',this)">🐋 Whale</button>
+    <button class="chip" onclick="filterN('SECURITY',this)">🔒 אבטחה</button>
+    <button class="chip" onclick="filterN('EDUCATIONAL',this)">📚 למידה</button>
+  </div>
+  <div class="hotbar" id="hotbar"><div class="hotl">🔥 הכי חם עכשיו</div><div id="hotitems"></div></div>
+  <div class="ngrid" id="ngrid"><div class="empty" style="grid-column:1/-1"><div class="spin"></div><div class="etxt">טוען + מנתח AI...</div></div></div>
+</div></div>
+
+<!-- PORT -->
+<div class="page" id="p-port">
+<div class="gwrap">
+  <div class="phdr"><div class="ptitle">◎ פורטפוליו</div><span class="ptag" id="pcnt">0 פוזיציות</span><span style="margin-right:auto;font-family:var(--mono);font-size:.54rem;color:var(--txt2)">רווח: <span id="ptotal" style="color:var(--green);font-weight:500">–</span></span></div>
+  <div id="pgrid"><div class="gempty"><div class="etxt">לחץ "+ פורטפוליו" על איתות</div></div></div>
+</div></div>
+
+<!-- PERF -->
+<div class="page" id="p-perf">
+<div class="gwrap">
+  <div class="phdr"><div class="ptitle">▣ ביצועים</div><button class="hbtn" onclick="loadPerf()" style="width:auto;padding:0 8px;font-size:.48rem">⟳</button></div>
+  <div class="stats">
+    <div class="sc sc-b"><div class="sc-accent"></div><div class="sc-lbl">סה"כ</div><div class="sc-val" style="color:var(--blue)" id="pt">–</div></div>
+    <div class="sc sc-y"><div class="sc-accent"></div><div class="sc-lbl">פתוחים</div><div class="sc-val" style="color:var(--yellow)" id="po">–</div></div>
+    <div class="sc sc-g"><div class="sc-accent"></div><div class="sc-lbl">✓ מטרה</div><div class="sc-val" style="color:var(--green)" id="ph">–</div></div>
+    <div class="sc sc-r"><div class="sc-accent"></div><div class="sc-lbl">✗ סטופ</div><div class="sc-val" style="color:var(--red)" id="ps">–</div></div>
+  </div>
+  <div id="plist"><div class="empty"><div class="etxt">אין היסטוריה עדיין</div></div></div>
+</div></div>
+
+<!-- BT -->
+<div class="page" id="p-bt">
+<div class="gwrap">
+  <div class="phdr"><div class="ptitle">⚙ Backtest</div><button class="scan-btn" onclick="loadBT()" style="font-size:.58rem;padding:.22rem .65rem">▶ הרץ</button></div>
+  <div class="gcard" id="btstatus"><div class="etxt">לחץ "הרץ" לקבלת המלצות</div></div>
+  <div class="stats" id="btstats" style="display:none">
+    <div class="sc sc-g"><div class="sc-accent"></div><div class="sc-lbl">Win Rate</div><div class="sc-val" id="btwr">–</div></div>
+    <div class="sc sc-b"><div class="sc-accent"></div><div class="sc-lbl">סף מומלץ</div><div class="sc-val" style="color:var(--blue)" id="btthr">–</div></div>
+    <div class="sc sc-y"><div class="sc-accent"></div><div class="sc-lbl">ניקוד ממוצע</div><div class="sc-val" style="color:var(--yellow)" id="btavg">–</div></div>
+    <div class="sc"><div class="sc-accent"></div><div class="sc-lbl">נותחו</div><div class="sc-val" id="bttot">–</div></div>
+  </div>
+  <div id="btrec" style="display:none;background:var(--blue3);border:1px solid rgba(37,99,235,.15);border-radius:var(--r2);padding:14px 16px;font-size:.72rem;color:var(--txt);direction:rtl;line-height:1.85;box-shadow:var(--shadow)"></div>
+</div></div>
+
+<!-- PRICES -->
+<div class="page" id="p-prices">
+<div class="prwrap">
+  <div class="phdr">
+    <div class="ptitle">💹 מחירים חיים</div>
+    <span class="ptag" style="color:var(--green);border-color:rgba(5,150,105,.2)">🟢 WebSocket</span>
+    <span class="ptag" id="pcnt2">– מטבעות</span>
+    <div style="flex:1"></div>
+    <input id="psrch" style="font-family:var(--he);font-size:.75rem;background:var(--bg3);border:1px solid var(--line);border-radius:5px;padding:.28rem .6rem;color:var(--txt);outline:none;width:155px;transition:all .15s" placeholder="🔍 חפש..." oninput="filterP(this.value)" onfocus="this.style.borderColor='rgba(37,99,235,.4)';this.style.background='#fff'" onblur="this.style.borderColor='var(--line)';this.style.background='var(--bg3)'"/>
+  </div>
+  <div class="qabox" id="qabox"></div>
+  <div id="pgrid2" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px">
+    <div class="empty" style="grid-column:1/-1"><div class="spin"></div><div class="etxt">ממתין ל-WebSocket...</div></div>
+  </div>
+</div></div>
+
+<!-- LEARN -->
+<div class="page" id="p-learn">
+<div class="gwrap">
+  <div class="phdr"><div class="ptitle">🧠 AI למידה עצמית</div><button class="hbtn" onclick="loadLearn()" style="width:auto;padding:0 8px;font-size:.48rem">⟳</button><button class="hbtn" onclick="resetLearn()" style="width:auto;padding:0 8px;font-size:.48rem;color:var(--red)">🗑</button></div>
+  <div class="gcard" id="lrnstatus"><div class="etxt">טוען...</div></div>
+  <div class="stats" id="lrnscores" style="display:none"></div>
+  <div id="lrnsrc" style="display:none"><div style="font-family:var(--mono);font-size:.44rem;color:var(--txt3);letter-spacing:.13em;text-transform:uppercase;margin-bottom:6px">ביצועי מקורות</div><div id="lrnsrclist" style="display:flex;flex-direction:column;gap:5px"></div></div>
+  <div id="lrnrec" style="display:none;background:var(--blue3);border:1px solid rgba(37,99,235,.15);border-radius:var(--r2);padding:14px 16px;font-size:.72rem;color:var(--txt);direction:rtl;line-height:1.85;box-shadow:var(--shadow)"></div>
+</div></div>
+
+<!-- TRADE -->
+<div class="page" id="p-trade">
+<div class="gwrap">
+  <div class="phdr">
+    <div class="ptitle">⚡ Auto-Trade</div>
+    <span id="at-status-badge" style="font-family:var(--mono);font-size:.44rem;padding:.15rem .42rem;border-radius:4px;border:1px solid;background:var(--red3);color:var(--red);border-color:rgba(220,38,38,.2)">⏸ כבוי</span>
+    <button class="hbtn" onclick="loadTradeStatus()" style="width:auto;padding:0 8px;font-size:.48rem">⟳</button>
+  </div>
+
+  <!-- Warning banner -->
+  <div style="background:#fffbeb;border:1px solid rgba(217,119,6,.25);border-radius:var(--r2);padding:12px 15px;display:flex;gap:10px;align-items:flex-start">
+    <span style="font-size:1.1rem;flex-shrink:0">⚠️</span>
+    <div style="direction:rtl">
+      <div style="font-family:var(--ui);font-size:.78rem;font-weight:600;color:var(--yellow);margin-bottom:4px">אזהרה — קרא לפני הפעלה</div>
+      <div style="font-size:.7rem;color:var(--txt2);line-height:1.6">
+        Auto-Trade מבצע עסקאות אמיתיות בכסף שלך.<br>
+        • מצב Testnet בטוח (כסף מדומה) — מומלץ להתחיל שם<br>
+        • רק איתותים עם ניקוד 88+ יבוצעו<br>
+        • סיכון מקסימלי: 5% מהתיק לעסקה<br>
+        • תמיד יש SL + TP אוטומטי<br>
+        • <b>לעולם אל תחבר את כל הכסף שלך!</b>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status card -->
+  <div class="gcard" id="trade-status-card">
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      <div>
+        <div class="sc-lbl">מצב</div>
+        <div id="at-mode" style="font-family:var(--ui);font-size:1.4rem;font-weight:700;color:var(--txt3)">–</div>
+      </div>
+      <div class="wr-sep"></div>
+      <div>
+        <div class="sc-lbl">בורסה</div>
+        <div id="at-exchange" style="font-family:var(--mono);font-size:.9rem;font-weight:600">–</div>
+      </div>
+      <div>
+        <div class="sc-lbl">יתרה</div>
+        <div id="at-balance" style="font-family:var(--ui);font-size:1.1rem;font-weight:700;color:var(--green)">–</div>
+      </div>
+      <div>
+        <div class="sc-lbl">סיכון לעסקה (5%)</div>
+        <div id="at-risk" style="font-family:var(--mono);font-size:.9rem;font-weight:600;color:var(--yellow)">–</div>
+      </div>
+      <div class="wr-sep"></div>
+      <div>
+        <div class="sc-lbl">API מחובר</div>
+        <div id="at-apis" style="font-size:.72rem;line-height:1.6"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exchange cards -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px">
+    <div class="gcard" style="border-top:2px solid #f0a500">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:1.1rem">🟡</span>
+        <span style="font-family:var(--ui);font-weight:700">Binance Futures</span>
+        <span id="binance-dot" style="width:7px;height:7px;border-radius:50%;background:var(--line2);margin-right:auto"></span>
+      </div>
+      <div style="font-size:.68rem;color:var(--txt3);direction:rtl;line-height:1.7;margin-bottom:10px">
+        הגדר ב-Render Environment:<br>
+        <code style="font-family:var(--mono);font-size:.6rem;background:var(--bg3);padding:.1rem .3rem;border-radius:3px">BINANCE_API_KEY</code><br>
+        <code style="font-family:var(--mono);font-size:.6rem;background:var(--bg3);padding:.1rem .3rem;border-radius:3px">BINANCE_API_SECRET</code>
+      </div>
+      <button onclick="testExchange('binance',this)" class="scan-btn" style="font-size:.56rem;padding:.2rem .6rem;width:100%">🔗 בדוק חיבור</button>
+    </div>
+
+    <div class="gcard" style="border-top:2px solid #f97316">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:1.1rem">🟠</span>
+        <span style="font-family:var(--ui);font-weight:700">Bybit</span>
+        <span id="bybit-dot" style="width:7px;height:7px;border-radius:50%;background:var(--line2);margin-right:auto"></span>
+      </div>
+      <div style="font-size:.68rem;color:var(--txt3);direction:rtl;line-height:1.7;margin-bottom:10px">
+        הגדר ב-Render Environment:<br>
+        <code style="font-family:var(--mono);font-size:.6rem;background:var(--bg3);padding:.1rem .3rem;border-radius:3px">BYBIT_API_KEY</code><br>
+        <code style="font-family:var(--mono);font-size:.6rem;background:var(--bg3);padding:.1rem .3rem;border-radius:3px">BYBIT_API_SECRET</code>
+      </div>
+      <button onclick="testExchange('bybit',this)" class="scan-btn" style="font-size:.56rem;padding:.2rem .6rem;width:100%">🔗 בדוק חיבור</button>
+    </div>
+
+    <div class="gcard" style="border-top:2px solid #3a7bd5">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:1.1rem">🔵</span>
+        <span style="font-family:var(--ui);font-weight:700">OKX</span>
+        <span id="okx-dot" style="width:7px;height:7px;border-radius:50%;background:var(--line2);margin-right:auto"></span>
+      </div>
+      <div style="font-size:.68rem;color:var(--txt3);direction:rtl;line-height:1.7;margin-bottom:10px">
+        הגדר ב-Render Environment:<br>
+        <code style="font-family:var(--mono);font-size:.6rem;background:var(--bg3);padding:.1rem .3rem;border-radius:3px">OKX_API_KEY + OKX_PASSPHRASE</code>
+      </div>
+      <button onclick="testExchange('okx',this)" class="scan-btn" style="font-size:.56rem;padding:.2rem .6rem;width:100%">🔗 בדוק חיבור</button>
+    </div>
+
+    <div class="gcard" style="border-top:2px solid #059669">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:1.1rem">🟢</span>
+        <span style="font-family:var(--ui);font-weight:700">MEXC</span>
+        <span id="mexc-dot" style="width:7px;height:7px;border-radius:50%;background:var(--line2);margin-right:auto"></span>
+      </div>
+      <div style="font-size:.68rem;color:var(--txt3);direction:rtl;line-height:1.7;margin-bottom:10px">
+        הגדר ב-Render Environment:<br>
+        <code style="font-family:var(--mono);font-size:.6rem;background:var(--bg3);padding:.1rem .3rem;border-radius:3px">MEXC_API_KEY + MEXC_API_SECRET</code>
+      </div>
+      <button onclick="testExchange('mexc',this)" class="scan-btn" style="font-size:.56rem;padding:.2rem .6rem;width:100%">🔗 בדוק חיבור</button>
+    </div>
+  </div>
+
+  <!-- Setup guide -->
+  <div class="gcard" style="direction:rtl">
+    <div style="font-family:var(--ui);font-weight:700;margin-bottom:10px">📋 איך להפעיל Auto-Trade</div>
+    <div style="font-size:.72rem;color:var(--txt2);line-height:2">
+      <b>שלב 1 — צור API Key בבורסה:</b><br>
+      • Binance: פרופיל → API Management → Create API → סמן Futures Trading<br>
+      • Bybit: פרופיל → API → Create API → סמן Trade<br>
+      • OKX: פרופיל → API → Create V5 API → Futures<br>
+      • MEXC: פרופיל → API Management → Create API<br><br>
+      <b>שלב 2 — הגדר ב-Render Environment Variables:</b><br>
+      • <code style="font-family:var(--mono);font-size:.6rem;background:var(--bg3);padding:.1rem .3rem;border-radius:3px">AUTO_TRADE_ENABLED = true</code><br>
+      • <code style="font-family:var(--mono);font-size:.6rem;background:var(--bg3);padding:.1rem .3rem;border-radius:3px">AUTO_TRADE_EXCHANGE = binance</code> (או bybit/okx/mexc)<br>
+      • <code style="font-family:var(--mono);font-size:.6rem;background:var(--bg3);padding:.1rem .3rem;border-radius:3px">AUTO_TRADE_TESTNET = true</code> (בדיקה!) / false (אמיתי)<br>
+      • <code style="font-family:var(--mono);font-size:.6rem;background:var(--bg3);padding:.1rem .3rem;border-radius:3px">AUTO_TRADE_RISK_PCT = 5</code><br>
+      • המפתחות של הבורסה שבחרת<br><br>
+      <b>שלב 3 — בדוק חיבור לחיצה על "בדוק חיבור"</b><br>
+      <b>שלב 4 — הפעל סריקה ← האתר יסחר אוטומטית!</b>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+<script>
+
+let allSig=[],allNews=[],allPrices={},activeF='ALL',activeNC='ALL',sortBy='score';
+let portfolio=JSON.parse(localStorage.getItem('nxport')||'[]');
+let sndOn=localStorage.getItem('nxsnd')!=='off';
+let lastCnt=0,priceInt=null;
+
+const SRC_C={CoinDesk:'#f0a500',Cointelegraph:'#3a7bd5','Bitcoin.com':'#f97316',Bitcoinist:'#8b5cf6',CryptoNews:'#00b57a','CoinGecko Trending':'#00b57a','Binance Official':'#f59e0b','Whale Alert':'#e84060','CryptoPanic Hot':'#f97316',NewsAPI:'#3a7bd5',CryptoSlate:'#8b5cf6'};
+const CC={BTC:'#f0a500',ETH:'#8b5cf6',ALTCOIN:'#3a7bd5',DeFi:'#00b57a',REGULATION:'#e84060',WHALE:'#06b6d4',SECURITY:'#f0a500',GENERAL:'#64748b','NFT/WEB3':'#8b5cf6',EDUCATIONAL:'#8b5cf6',ANALYSIS:'#00b57a'};
+const CI={BTC:'₿',ETH:'Ξ',ALTCOIN:'🔷',DeFi:'⚡',REGULATION:'⚖️',WHALE:'🐋',SECURITY:'🔒',GENERAL:'📰','NFT/WEB3':'🎨',EDUCATIONAL:'📚',ANALYSIS:'📊'};
+
+setInterval(()=>{const e=document.getElementById('clk');if(e)e.textContent=new Date().toLocaleTimeString('he-IL',{timeZone:'Asia/Jerusalem',hour12:false})},1000);
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2500)}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function fmt(v){if(!v||v==='NA')return'–';const n=parseFloat(v);return isNaN(n)?'–':'$'+n.toLocaleString('en',{maximumFractionDigits:6})}
+function fmtP(p){if(!p)return'–';const n=parseFloat(p);if(isNaN(n))return'–';return n>10000?'$'+Math.round(n).toLocaleString():n>1?'$'+n.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:4}):n>0.001?'$'+n.toFixed(6):'$'+n.toFixed(8)}
+function fmtT(ts){if(!ts)return'–';try{return new Date(ts.replace(' ','T')+'Z').toLocaleTimeString('he-IL',{timeZone:'Asia/Jerusalem',hour12:false})}catch{return ts}}
+function scC(s){const n=parseInt(s)||50;return n>=78?'sh':n>=62?'sm':'sl'}
+function hC(h){return h>=8?'var(--red)':h>=5?'var(--yellow)':'var(--txt3)'}
+function sB(s){return s==='BULLISH'?'<span class="pos" style="font-size:.6rem">📈</span>':s==='BEARISH'?'<span class="neg" style="font-size:.6rem">📉</span>':'<span class="neu" style="font-size:.6rem">➡️</span>'}
+function beep(t){if(!sndOn)return;try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=t==='BUY'?880:440;g.gain.setValueAtTime(.15,c.currentTime);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.28);o.start();o.stop(c.currentTime+.28)}catch{}}
+
+function toggleSnd(){sndOn=!sndOn;document.getElementById('sbtn').textContent=sndOn?'🔔':'🔕';localStorage.setItem('nxsnd',sndOn?'on':'off')}
+if(!sndOn)document.getElementById('sbtn').textContent='🔕';
+
+function showP(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.np').forEach(x=>x.classList.remove('on'));
+  document.getElementById('p-'+p).classList.add('on');
+  document.getElementById('n-'+p).classList.add('on');
+  if(p==='news'&&!allNews.length)loadNews();
+  if(p==='perf')loadPerf();
+  if(p==='port')renderPort();
+  if(p==='prices'){loadPrices();if(!priceInt)priceInt=setInterval(loadPrices,2000)}
+  else if(priceInt){clearInterval(priceInt);priceInt=null}
+  if(p==='learn')loadLearn();
+}
+
+function renderCards(sigs){
+  const el=document.getElementById('cards');
+  document.getElementById('cnt').textContent=sigs.length+' איתותים';
+  if(!sigs.length){el.innerHTML='<div class="empty"><div style="font-size:1.4rem;opacity:.07;margin-bottom:8px">⬡</div><div class="etxt">אין איתותים — לחץ סריקה</div></div>';return}
+  el.innerHTML=sigs.map((s,i)=>{
+    const sig=s.signal||'WAIT',dir=s.direction||'המתן',sc=s.score||50;
+    const lev=(s.leverage||'x10').replace(/[xX]/g,'');
+    const hl=esc((s.news_title_he||s.news_title||'').slice(0,108));
+    const rs=esc((s.reason_he||s.reason||'').slice(0,132));
+    const sym=esc(s.symbol||'');
+    const inP=portfolio.some(p=>p.id===s.id);
+    const dc=dir==='ארוך'?'dl':dir==='קצר'?'ds':'dw';
+    const di=dir==='ארוך'?'▲ לונג':dir==='קצר'?'▼ שורט':'◆ המתן';
+    const cc=sig==='BUY'?'buy':sig==='SELL'?'sell':'wait';
+    const sc2=sig==='BUY'?'var(--green)':sig==='SELL'?'var(--red)':'var(--yellow)';
+    const rc=s.result==='TARGET_HIT'?'rh':s.result==='STOP_LOSS'?'rs':'ro';
+    const rt=s.result==='TARGET_HIT'?'✓ מטרה':s.result==='STOP_LOSS'?'✗ סטופ':'פתוח';
+    return `<div class="card ${cc}" style="animation-delay:${i*.02}s">
+      <div class="ch">
+        <span class="csym" style="color:${sc2}">${sym}</span>
+        <div class="badges">
+          <span class="dbadge ${dc}">${di}</span>
+          <span class="sbadge ${scC(sc)}">${sc}/100</span>
+          ${s.confluence_count?`<span class="cbadge">${s.confluence_count}✓</span>`:''}
+        </div>
+      </div>
+      <div class="fstrip">
+        <span class="ftag">🔮 FUTURES</span>
+        <span class="flev">×${esc(lev)}</span>
+        ${s.liq_price&&s.liq_price!=='NA'?`<span class="fliq">💥 ${fmt(s.liq_price)}</span>`:'<span style="margin-right:auto"></span>'}
+      </div>
+      ${hl?`<div class="chl">${hl}</div>`:''}
+      <div class="pg">
+        <div class="pf"><div class="pfl">כניסה</div><div class="pfv" style="color:var(--blue)">${fmt(s.entry)}</div></div>
+        <div class="pf"><div class="pfl">סטופ</div><div class="pfv" style="color:var(--red)">${fmt(s.stop_loss)}</div></div>
+        <div class="pf"><div class="pfl">R/R</div><div class="pfv" style="color:var(--yellow)">1:${s.rr_ratio||'?'}</div></div>
+      </div>
+      <div class="tg">
+        <div class="tc"><div class="tl">מטרה 1 · 50%</div><div class="tv">${fmt(s.target1)}</div></div>
+        <div class="tc"><div class="tl">מטרה 2 · 30%</div><div class="tv">${fmt(s.target2)}</div></div>
+        <div class="tc"><div class="tl">מטרה 3 · 20%</div><div class="tv">${fmt(s.target3)}</div></div>
+      </div>
+      <div class="tvz" id="tv-${s.id}">
+        <div class="tvph"><div class="tvpi">📊</div><div class="tvpt">לחץ לגרף TradingView חי</div></div>
+      </div>
+      ${s.position_size?`<div class="rbox">
+        <div class="ri"><div class="rl">פוזיציה</div><div class="rv" style="color:var(--yellow)">${esc(s.position_size)}%</div></div>
+        <div class="rdiv"></div>
+        <div class="ri"><div class="rl">מקס</div><div class="rv" style="color:var(--red)">25%</div></div>
+        ${s.rr_ratio?`<div class="rdiv"></div><div class="ri"><div class="rl">R:R</div><div class="rv pos">1:${esc(s.rr_ratio)}</div></div>`:''}
+        ${s.risk_warning?`<div class="rw">⚠️ ${esc(s.risk_warning)}</div>`:''}
+      </div>`:''}
+      ${rs?`<div class="creason">💡 ${rs}</div>`:''}
+      <div class="cfoot">
+        <span class="fsrc">${esc(s.source||'')}</span>
+        <span class="rbadge ${rc}">${rt}</span>
+        <button class="pbtn" onclick='togglePort(${JSON.stringify(s).replace(/'/g,"&#39;")})'>${inP?'✓ בפורטפוליו':'+ פורטפוליו'}</button>
+        <span class="ftime">${fmtT(s.timestamp)}</span>
+      </div>
+    </div>`;
+  }).join('');
+  sigs.forEach(s=>{
+    const e=document.getElementById('tv-'+s.id);
+    if(e)e.addEventListener('click',function(){
+      const sym2=(s.symbol||'BTC/USDT').replace('/','');
+      this.innerHTML=`<iframe src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:${sym2}&interval=1H&theme=dark&style=1&locale=he&hide_top_toolbar=1&hide_legend=1" allowtransparency="true" frameborder="0" scrolling="no"></iframe>`;
+    },{once:true});
+  });
+}
+
+function updateStats(sigs,st){
+  const bc=sigs.filter(s=>s.signal==='BUY').length;
+  const sc2=sigs.filter(s=>s.signal==='SELL').length;
+  const wc=sigs.filter(s=>s.signal==='WAIT').length;
+  document.getElementById('cb').textContent=bc;
+  document.getElementById('cs').textContent=sc2;
+  document.getElementById('cw').textContent=wc;
+  document.getElementById('s-today').textContent=st.today||0;
+  document.getElementById('prog').style.width=Math.min(100,(st.today/10)*100)+'%';
+  document.getElementById('s-rem').textContent=(st.remaining||0)+' נותרו מ-10';
+  document.getElementById('s-sync').textContent=new Date().toLocaleTimeString('he-IL',{timeZone:'Asia/Jerusalem',hour12:false});
+  const rv=document.getElementById('regime'),rss=document.getElementById('regime-s');
+  if(bc>sc2&&bc>wc){rv.textContent='שוורי 📈';rv.style.color='var(--green)';rss.textContent=bc+' קנה vs '+sc2+' מכור'}
+  else if(sc2>bc&&sc2>wc){rv.textContent='דובי 📉';rv.style.color='var(--red)';rss.textContent=sc2+' מכור vs '+bc+' קנה'}
+  else{rv.textContent='נייטרלי ⚖';rv.style.color='var(--yellow)';rss.textContent='ללא כיוון ברור'}
+  if(lastCnt>0&&sigs.length>lastCnt){const n=sigs[0];if(n&&n.signal!=='WAIT'){beep(n.signal);toast((n.signal==='BUY'?'🟢 ':'🔴 ')+n.symbol)}}
+  lastCnt=sigs.length;
+  const risk=sigs.filter(s=>!s.result||s.result==='OPEN').reduce((a,s)=>a+parseFloat(s.position_size||2),0);
+  const re=document.getElementById('orisk');if(re){re.textContent=risk.toFixed(1)+'%';re.className='wr-v '+(risk>20?'neg':risk>15?'':'pos')}
+  document.getElementById('lupd').textContent='עודכן '+new Date().toLocaleTimeString('he-IL',{timeZone:'Asia/Jerusalem',hour12:false})+' · רענון כל 60 שנ׳';
+}
+
+function setF(v,btn){activeF=v;document.querySelectorAll('.chips .chip').forEach(c=>c.className='chip');const m={ALL:'ca',BUY:'cg',SELL:'cr',WAIT:'cy'};btn.classList.add(m[v]||'ca');applyF()}
+function applyF(){
+  const q=document.getElementById('srch').value.toLowerCase().trim();
+  let f=[...allSig];
+  if(activeF!=='ALL')f=f.filter(s=>s.signal===activeF);
+  if(q)f=f.filter(s=>(s.symbol||'').toLowerCase().includes(q)||(s.news_title_he||'').includes(q)||(s.news_title||'').toLowerCase().includes(q));
+  if(sortBy==='time')f.sort((a,b)=>new Date(b.timestamp||0)-new Date(a.timestamp||0));
+  else if(sortBy==='rr')f.sort((a,b)=>parseFloat(b.rr_ratio||0)-parseFloat(a.rr_ratio||0));
+  else f.sort((a,b)=>(b.score||0)-(a.score||0));
+  renderCards(f);
+}
+
+async function loadSigs(){try{const[r1,r2]=await Promise.all([fetch('/api/signals'),fetch('/api/stats')]);allSig=await r1.json();const st=await r2.json();updateStats(allSig,st);applyF();updatePortP()}catch(e){console.error(e)}}
+async function trigJob(){const btn=document.getElementById('scanbtn');btn.disabled=true;btn.textContent='⏳ סורק...';try{const r=await fetch('/api/trigger',{method:'POST'});if(r.ok){toast('✓ סריקה הושלמה');setTimeout(loadSigs,5000)}else toast('⚠ שגיאה')}catch{toast('⚠ שגיאת רשת')}finally{btn.disabled=false;btn.textContent='▶ סריקה'}}
+async function loadWR(){try{const r=await fetch('/api/winrate');const d=await r.json();if(!d||!d.total_closed)return;document.getElementById('wrbar').classList.add('on');const pct=d.win_rate_pct||0;const pe=document.getElementById('wrp');pe.textContent=pct+'%';pe.className='wr-num '+(pct>=65?'pos':pct>=45?'':'neg');document.getElementById('wrh').textContent=d.hits||0;document.getElementById('wrs').textContent=d.stop_losses||0;document.getElementById('wrw').textContent=(d.week_win_rate||0)+'%';const pnl=d.avg_pnl_pct||0;const pe2=document.getElementById('wrpnl');pe2.textContent=(pnl>0?'+':'')+pnl+'%';pe2.className='wr-v '+(pnl>0?'pos':pnl<0?'neg':'neu');const h=new Date().getUTCHours()+3;const sess=h>=14&&h<22?{t:'🟢 US',c:'var(--green)'}:h>=9&&h<14?{t:'🔵 EU',c:'var(--blue)'}:h>=1&&h<9?{t:'🟡 אסיה',c:'var(--yellow)'}:{t:'⚪ שקט',c:'var(--txt3)'};const st=document.getElementById('stag');st.textContent=sess.t;st.style.color=sess.c;st.style.borderColor=sess.c+'44';st.style.background=sess.c+'11'}catch{}}
+async function loadBreaking(){try{const r=await fetch('/api/news/realtime');const items=await r.json();const hot=items.filter(n=>n.heat>=7).slice(0,6);if(!hot.length)return;document.getElementById('tbar').classList.add('on');const content=hot.map(n=>'🔥 '+(n.title_he||n.title||'')+' &nbsp;&nbsp;&nbsp; ').join('');const tt=document.getElementById('ttxt');tt.innerHTML=content+content}catch{}}
+
+function togglePort(sig){const idx=portfolio.findIndex(p=>p.id===sig.id);if(idx>=0){portfolio.splice(idx,1);toast('הוסר')}else{portfolio.push({...sig,added:new Date().toISOString()});toast('✓ נוסף')}localStorage.setItem('nxport',JSON.stringify(portfolio));applyF()}
+async function updatePortP(){for(const pos of portfolio){if(!pos.symbol)continue;try{const r=await fetch('/api/price/'+encodeURIComponent(pos.symbol));const d=await r.json();pos.currentPrice=d.price}catch{}}localStorage.setItem('nxport',JSON.stringify(portfolio));if(document.getElementById('p-port').classList.contains('on'))renderPort()}
+function renderPort(){
+  const el=document.getElementById('pgrid');document.getElementById('pcnt').textContent=portfolio.length+' פוזיציות';
+  if(!portfolio.length){el.innerHTML='<div class="gempty"><div class="etxt">לחץ "+ פורטפוליו" על איתות</div></div>';document.getElementById('ptotal').textContent='–';return}
+  let tot=0,cnt=0;
+  el.innerHTML='<div style="display:flex;flex-direction:column;gap:5px">'+portfolio.map(p=>{
+    const e=parseFloat(p.entry||0),c=parseFloat(p.currentPrice||0);let pnl=0,ps='–';
+    if(e>0&&c>0){pnl=p.signal==='BUY'?(c-e)/e*100:(e-c)/e*100;ps=(pnl>0?'+':'')+pnl.toFixed(2)+'%';tot+=pnl;cnt++}
+    return `<div class="grow"><span style="font-family:var(--ui);font-size:.9rem;font-weight:700;min-width:90px;color:${p.signal==='BUY'?'var(--green)':'var(--red)'}">${esc(p.symbol||'')}</span><span style="font-family:var(--mono);font-size:.52rem;color:var(--txt2)">כניסה: $${esc(p.entry||'–')}</span><span style="font-family:var(--mono);font-size:.54rem">נוכחי: $${esc(p.currentPrice||'–')}</span><span style="font-family:var(--ui);font-size:.88rem;font-weight:700;margin-right:auto;color:${pnl>0?'var(--green)':pnl<0?'var(--red)':'var(--txt3)'}">${ps}</span><button onclick="remP(${p.id})" style="font-family:var(--mono);font-size:.42rem;padding:.08rem .34rem;border-radius:3px;border:1px solid rgba(232,64,96,.2);background:var(--red3);color:var(--red);cursor:pointer">✕</button></div>`;
+  }).join('')+'</div>';
+  if(cnt>0){const avg=tot/cnt;const e=document.getElementById('ptotal');e.textContent=(avg>0?'+':'')+avg.toFixed(2)+'%';e.style.color=avg>0?'var(--green)':avg<0?'var(--red)':'var(--txt2)'}}
+function remP(id){portfolio=portfolio.filter(p=>p.id!==id);localStorage.setItem('nxport',JSON.stringify(portfolio));renderPort();applyF()}
+
+function filterN(cat,btn){activeNC=cat;document.querySelectorAll('.catbar .chip').forEach(c=>c.className='chip');btn.classList.add('ca');renderNews()}
+function renderNews(){
+  const grid=document.getElementById('ngrid');
+  const f=activeNC==='ALL'?allNews:allNews.filter(n=>n.category===activeNC||n.edu_type===activeNC);
+  document.getElementById('ncnt').textContent=f.length+' חדשות';
+  const hot=allNews.filter(n=>n.heat>=7).slice(0,3);
+  const hb=document.getElementById('hotbar');
+  if(hot.length){hb.classList.add('on');document.getElementById('hotitems').innerHTML=hot.map(n=>`<div class="hoti"><span class="hoth" style="color:${hC(n.heat)}">🔥${n.heat}</span><span class="hottt">${n.title_he||n.title||''}</span>${sB(n.sentiment)}</div>`).join('')}
+  if(!f.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="etxt">אין חדשות</div></div>';return}
+  grid.innerHTML=f.map((n,i)=>{
+    const col=SRC_C[n.source]||'#64748b';const h=n.heat||1;const cat=n.category||'GENERAL';const cc=CC[cat]||'#64748b';const ci=CI[cat]||'📰';
+    return `<div class="nc" style="animation-delay:${i*.012}s">
+      <div class="ncm"><div class="ncd" style="background:${col}"></div><span class="ncs">${esc(n.source||'')}</span><span class="nccat" style="background:${cc}18;color:${cc}">${ci} ${cat}</span><span style="margin-right:auto">${sB(n.sentiment||n.sentiment_news)}</span>${n.credibility>=9?`<span style="font-family:var(--mono);font-size:.38rem;background:var(--green3);color:var(--green);border:1px solid rgba(0,181,122,.18);padding:.04rem .26rem;border-radius:2px">T1</span>`:''}<span style="font-family:var(--mono);font-size:.44rem;font-weight:500;color:${hC(h)}">${h}/10</span></div>
+      <div class="nchb"><div class="nchi" style="width:${h*10}%;background:${hC(h)}"></div></div>
+      ${n.title_he?`<div class="ncht">${esc(n.title_he)}</div>`:''}
+      <div class="ncte">${esc((n.title||'').slice(0,102))}</div>
+      ${n.age_minutes?`<div style="font-family:var(--mono);font-size:.39rem;color:var(--txt3)">לפני ${n.age_minutes} דק׳</div>`:''}
+      ${n.what_is?`<div class="edu" style="background:${cc}0d;border:1px solid ${cc}22"><div class="edulbl" style="color:${cc}">📖 מה זה?</div><div class="edutxt">${esc(n.what_is)}</div></div>`:''}
+      ${n.why_hot?`<div class="edu" style="background:var(--blue3);border:1px solid rgba(58,123,213,.12)"><div class="edulbl" style="color:var(--blue)">💡 למה חשוב?</div><div class="edutxt">${esc(n.why_hot)}</div>${n.affected_coins?`<div style="font-family:var(--mono);font-size:.39rem;color:var(--txt3);margin-top:3px">🪙 ${esc(n.affected_coins)}</div>`:''}</div>`:''}
+      ${n.market_impact?`<div class="edu" style="background:var(--green3);border:1px solid rgba(0,181,122,.1)"><div class="edulbl" style="color:var(--green)">📊 השפעה</div><div class="edutxt">${esc(n.market_impact)}</div></div>`:''}
+      ${n.trading_lesson?`<div class="edu" style="background:var(--yellow3);border:1px solid rgba(240,165,0,.1)"><div class="edulbl" style="color:var(--yellow)">🎓 שיעור</div><div class="edutxt">${esc(n.trading_lesson)}</div></div>`:''}
+      ${n.action?`<div class="edu" style="background:var(--red3);border:1px solid rgba(232,64,96,.1)"><div class="edulbl" style="color:var(--red)">🔮 מה לעשות?</div><div class="edutxt" style="font-weight:500">${esc(n.action)}</div></div>`:''}
+      <div class="ncbtns"><button class="nb nb-s" onclick="trigAndGo()">⚡ צור איתות</button>${!n.why_hot?`<button class="nb nb-e" onclick="eduItem(${i},this)">📚 נתח</button>`:''}</div>
+    </div>`;
+  }).join('');
+}
+async function eduItem(idx,btn){btn.textContent='⏳';btn.disabled=true;try{const r=await fetch('/api/news/educate/'+idx,{method:'POST'});const d=await r.json();if(d.why_hot){allNews[idx]=d;renderNews();toast('✓ ניתוח הושלם')}}catch{toast('⚠')}finally{btn.textContent='📚';btn.disabled=false}}
+async function loadNews(){document.getElementById('ngrid').innerHTML='<div class="empty" style="grid-column:1/-1"><div class="spin"></div><div class="etxt">טוען...</div></div>';document.getElementById('hotbar').classList.remove('on');try{const r=await fetch('/api/news');allNews=await r.json();renderNews()}catch{toast('⚠')}}
+async function loadRTNews(){document.getElementById('rtind').style.display='inline';document.getElementById('ngrid').innerHTML='<div class="empty" style="grid-column:1/-1"><div class="spin"></div><div class="etxt">Breaking...</div></div>';try{const r=await fetch('/api/news/realtime');const items=await r.json();if(items.length){allNews=items;renderNews()}else toast('אין Breaking כרגע')}catch{toast('⚠')}}
+async function bcastNews(btn){const o=btn.textContent;btn.textContent='⏳';btn.disabled=true;try{const r=await fetch('/api/news/broadcast?min_heat=4&max_items=8',{method:'POST'});const d=await r.json();toast(d.ok?'✈️ '+d.sent+' נשלחו':'⚠ '+d.error)}catch{toast('⚠')}finally{btn.textContent=o;btn.disabled=false}}
+async function sendTip(btn){const o=btn.textContent;btn.textContent='⏳';btn.disabled=true;try{const r=await fetch('/api/news/knowledge',{method:'POST'});const d=await r.json();toast(d.ok?'📚 טיפ #'+d.tip_number+' נשלח':'⚠ '+d.error)}catch{toast('⚠')}finally{btn.textContent=o;btn.disabled=false}}
+function trigAndGo(){trigJob();setTimeout(()=>showP('dash'),4000)}
+
+async function loadPerf(){try{const[pr,sr]=await Promise.all([fetch('/api/performance'),fetch('/api/signals')]);const perf=await pr.json();const sigs=await sr.json();document.getElementById('pt').textContent=perf.total||0;document.getElementById('po').textContent=perf.open||0;const hits=(perf.breakdown||[]).filter(r=>r.result==='TARGET_HIT').reduce((a,r)=>a+r.cnt,0);const sls=(perf.breakdown||[]).filter(r=>r.result==='STOP_LOSS').reduce((a,r)=>a+r.cnt,0);document.getElementById('ph').textContent=hits;document.getElementById('ps').textContent=sls;const closed=sigs.filter(s=>s.result&&s.result!=='OPEN').slice(0,60);const list=document.getElementById('plist');if(!closed.length){list.innerHTML='<div class="empty"><div class="etxt">אין היסטוריה</div></div>';return}list.innerHTML='<div style="display:flex;flex-direction:column;gap:5px">'+closed.map(s=>{const pnl=parseFloat(s.result_pnl||0);return `<div class="grow"><span style="font-family:var(--ui);font-size:.88rem;font-weight:700;min-width:90px;color:${s.signal==='BUY'?'var(--green)':'var(--red)'}">${esc(s.symbol||'')}</span><span style="font-family:var(--mono);font-size:.5rem;color:var(--txt3)">${esc(s.direction||'')}</span><span style="font-family:var(--mono);font-size:.5rem;color:var(--txt2)">$${esc(s.entry||'–')}</span><span style="font-family:var(--ui);font-size:.85rem;font-weight:700;margin-right:auto;color:${pnl>0?'var(--green)':pnl<0?'var(--red)':'var(--txt3)'}">${pnl>0?'+':''}${pnl.toFixed(2)}%</span><span class="rbadge ${s.result==='TARGET_HIT'?'rh':'rs'}">${s.result==='TARGET_HIT'?'✓ מטרה':'✗ סטופ'}</span><span style="font-family:var(--mono);font-size:.42rem;color:var(--txt3)">${fmtT(s.result_time)}</span></div>`;}).join('')+'</div>'}catch{}}
+async function loadBT(){const st=document.getElementById('btstatus');st.innerHTML='<div class="spin" style="margin:0 auto .4rem"></div><div class="etxt">מנתח...</div>';document.getElementById('btstats').style.display='none';document.getElementById('btrec').style.display='none';try{const r=await fetch('/api/backtest');const d=await r.json();if(d.status==='insufficient_data'){st.innerHTML=`<div class="etxt">צריך ${d.min_needed} איתותים (יש ${d.current})</div>`;return}st.style.display='none';document.getElementById('btstats').style.display='grid';const wr=d.win_rate||0;document.getElementById('btwr').textContent=wr+'%';document.getElementById('btwr').style.color=wr>=65?'var(--green)':wr>=45?'var(--yellow)':'var(--red)';document.getElementById('btthr').textContent=d.recommended_threshold;document.getElementById('btavg').textContent=d.avg_winning_score;document.getElementById('bttot').textContent=d.total_closed;const rec=document.getElementById('btrec');rec.style.display='block';rec.innerHTML=`📊 על בסיס <b>${d.total_closed}</b> איתותים:<br>• <b>סף מומלץ:</b> ${d.recommended_threshold}/100<br>• <b>מקורות:</b> ${(d.best_sources||[]).join(', ')}<br>• Win Rate: ${d.win_rate}% ${wr>=65?'✅':wr>=45?'⚡':'⚠️'}`}catch{st.innerHTML='<div class="etxt" style="color:var(--red)">שגיאה</div>'}}
+
+async function loadPrices(){try{const r=await fetch('/api/prices');const d=await r.json();allPrices=d.prices||{};const el=document.getElementById('pcnt2');if(el)el.textContent=Object.keys(allPrices).length+' מטבעות';const q=document.getElementById('psrch')?.value||'';filterP(q)}catch{}}
+function filterP(q){
+  const grid=document.getElementById('pgrid2');if(!grid)return;
+  const entries=Object.entries(allPrices);
+  const filtered=q?entries.filter(([k])=>k.toLowerCase().includes(q.toLowerCase())):entries;
+  const pri=['BTC','ETH','BNB','SOL','XRP','ADA','AVAX','DOT','MATIC','NEAR','ARB','OP','SUI','APT','INJ','TIA','SEI','WLD','TAO','JUP','ENA','WIF','BONK','PEPE','LINK'];
+  filtered.sort((a,b)=>{const ai=pri.indexOf(a[0]),bi=pri.indexOf(b[0]);if(ai>=0&&bi>=0)return ai-bi;if(ai>=0)return-1;if(bi>=0)return 1;return a[0].localeCompare(b[0])});
+  if(!filtered.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="etxt">ממתין ל-WebSocket...</div></div>';return}
+  grid.innerHTML=filtered.slice(0,300).map(([coin,price])=>{
+    const sig=allSig.find(s=>(s.symbol||'').includes(coin));
+    const hasSig=!!sig;
+    const sc2=hasSig?(sig.signal==='BUY'?'var(--green)':sig.signal==='SELL'?'var(--red)':'var(--yellow)'):'';
+    return `<div class="pmini" onclick="quickA('${coin}')" style="${hasSig?'border-color:'+sc2.replace('var(--','').replace(')','')+'33':''}" onmouseover="this.style.borderColor='var(--line2)'" onmouseout="this.style.borderColor='${hasSig?sc2.replace('var(--','').replace(')','')+'33':''}'">
+      ${hasSig?`<div class="pmdot" style="background:${sc2};box-shadow:0 0 5px ${sc2}"></div>`:''}
+      <div class="pmcoin" style="color:var(--txt)">${esc(coin)}</div>
+      <div class="pmprice" style="color:${hasSig?sc2:'var(--blue)'}">${fmtP(price)}</div>
+      ${hasSig?`<div class="pmsig" style="color:${sc2}">${sig.signal==='BUY'?'▲ קנה':sig.signal==='SELL'?'▼ מכור':'◆ המתן'}</div>`:''}
+    </div>`;
+  }).join('');
+}
+async function quickA(coin){
+  const qa=document.getElementById('qabox');qa.classList.add('on');
+  qa.innerHTML='<div class="spin" style="margin:0 auto .4rem"></div>';
+  try{const r=await fetch('/api/price/live/'+coin);const d=await r.json();if(d.error){qa.innerHTML=`<div class="etxt" style="color:var(--red)">${esc(d.error)}</div>`;return}
+  const col=d.entry_color==='green'?'var(--green)':d.entry_color==='red'?'var(--red)':'var(--yellow)';
+  qa.innerHTML=`<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+    <div><div class="sc-lbl">${esc(coin)}/USDT</div><div style="font-family:var(--ui);font-size:1.35rem;font-weight:700;color:var(--blue)">${fmtP(d.price)}</div></div>
+    <div class="wr-sep"></div>
+    <div><div class="sc-lbl">RSI</div><div style="font-family:var(--mono);font-size:1.1rem;font-weight:500;color:${d.rsi<30?'var(--green)':d.rsi>70?'var(--red)':'var(--yellow)'}">${Math.round(d.rsi||50)}</div></div>
+    <div><div class="sc-lbl">VWAP</div><div style="font-family:var(--mono);font-size:.76rem">$${d.vwap?d.vwap.toLocaleString():'–'}</div></div>
+    <div class="wr-sep"></div>
+    <div style="flex:1"><div class="sc-lbl">אות כניסה</div><div style="font-family:var(--ui);font-size:.8rem;font-weight:600;color:${col};direction:rtl">${esc(d.entry_signal||'')}</div></div>
+    <div><div class="sc-lbl">סטופ לונג</div><div style="font-family:var(--mono);font-size:.68rem;color:var(--red)">$${esc(String(d.stop_long||'–'))}</div></div>
+    <button onclick="trigJob();toast('⚡ מנתח ${coin}');document.getElementById('qabox').classList.remove('on')" style="font-family:var(--mono);font-size:.46rem;padding:.2rem .55rem;border-radius:4px;border:1px solid rgba(58,123,213,.25);background:var(--blue3);color:var(--blue);cursor:pointer">⚡ צור איתות</button>
+  </div>`}catch{qa.innerHTML='<div class="etxt" style="color:var(--red)">שגיאה</div>'}}
+
+async function loadLearn(){try{const r=await fetch('/api/learning');const d=await r.json();const data=d.data||{};const ins=d.insights||{};const total=data.total_analyzed||0;const st=document.getElementById('lrnstatus');const buyRate=ins.buy_win_rate||0,sellRate=ins.sell_win_rate||0,overallRate=total>0?Math.round((buyRate+sellRate)/2):0;const col=overallRate>=65?'var(--green)':overallRate>=45?'var(--yellow)':'var(--red)';st.innerHTML=`<div style="display:flex;gap:13px;align-items:center;flex-wrap:wrap"><div><div class="sc-lbl">סה"כ נלמד</div><div style="font-family:var(--ui);font-size:1.7rem;font-weight:700;color:var(--blue)">${total}</div><div class="sc-sub">איתותים</div></div><div class="wr-sep"></div><div><div class="sc-lbl">Win Rate</div><div style="font-family:var(--ui);font-size:1.6rem;font-weight:700;color:${col}">${overallRate}%</div></div><div><div class="sc-lbl">BUY</div><div style="font-family:var(--ui);font-size:.82rem;font-weight:600;color:var(--green)">${buyRate}%</div></div><div><div class="sc-lbl">SELL</div><div style="font-family:var(--ui);font-size:.82rem;font-weight:600;color:var(--red)">${sellRate}%</div></div><div style="margin-right:auto"><div class="sc-lbl">כיול אחרון</div><div style="font-family:var(--mono);font-size:.66rem;color:var(--txt2)">${data.last_calibration||'טרם בוצע'}</div></div>${total<10?`<div style="background:var(--yellow3);border:1px solid rgba(240,165,0,.18);border-radius:var(--r);padding:7px 11px;font-size:.68rem;color:var(--yellow);direction:rtl">⚡ צריך עוד ${10-total} איתותים</div>`:''}</div>`;if(total<3)return;const scoreAcc=ins.score_accuracy||{};if(Object.keys(scoreAcc).length){const sg=document.getElementById('lrnscores');sg.style.display='grid';sg.innerHTML=Object.entries(scoreAcc).sort((a,b)=>a[0].localeCompare(b[0])).map(([bucket,rate])=>`<div class="sc ${rate>=65?'sc-g':rate>=45?'sc-y':''}"><div class="sc-accent"></div><div class="sc-lbl">ניקוד ${bucket}</div><div class="sc-val" style="font-size:1.4rem;color:${rate>=65?'var(--green)':rate>=45?'var(--yellow)':'var(--red)'}">${rate}%</div><div class="sc-sub">win rate</div></div>`).join('')}const srcW=data.source_weights||{};const srcList=Object.entries(srcW).filter(([s,v])=>v.total>=2).sort((a,b)=>b[1].wins/b[1].total-a[1].wins/a[1].total);if(srcList.length){const sl=document.getElementById('lrnsrc');sl.style.display='block';document.getElementById('lrnsrclist').innerHTML=srcList.map(([src,v])=>{const rate=Math.round(v.wins/v.total*100);const c=rate>=65?'var(--green)':rate>=45?'var(--yellow)':'var(--red)';return `<div class="grow"><span style="font-family:var(--ui);font-weight:600;min-width:125px">${esc(src)}</span><span style="font-family:var(--mono);font-size:.5rem;color:var(--txt3)">${v.wins}/${v.total}</span><div style="flex:1;height:4px;background:rgba(255,255,255,.04);border-radius:2px;overflow:hidden;max-width:90px"><div style="height:100%;width:${rate}%;background:${c};border-radius:2px;transition:width .8s"></div></div><span style="font-family:var(--ui);font-size:.82rem;font-weight:700;color:${c}">${rate}%</span><span style="font-family:var(--mono);font-size:.4rem;padding:.06rem .28rem;border-radius:3px;background:${v.weight>=1.2?'var(--green3)':v.weight<=0.8?'var(--red3)':'var(--bg3)'};color:${v.weight>=1.2?'var(--green)':v.weight<=0.8?'var(--red)':'var(--txt3)'}">×${v.weight}</span></div>`;}).join('')}if(total>=10){const rec=document.getElementById('lrnrec');rec.style.display='block';const optThresh=data.score_thresholds?.optimal||65;const bestSrc=ins.best_sources||[];rec.innerHTML=`<div style="font-family:var(--mono);font-size:.44rem;color:var(--blue);letter-spacing:.13em;text-transform:uppercase;margin-bottom:9px">💡 המלצות (מבוסס למידה עצמית)</div><div>• <b>סף מומלץ:</b> ${optThresh}/100 (מחושב מ-${total} איתותים)<br>• <b>מקורות מובילים:</b> ${bestSrc.length?bestSrc.join(', '):'אין עדיין'}<br>• BUY: ${buyRate}% | SELL: ${sellRate}%<br><br><i style="color:var(--txt3)">מכוון אוטומטית כל 20 איתותים.</i></div>`}}catch(e){console.error(e)}}
+async function resetLearn(){if(!confirm('לאפס?'))return;try{await fetch('/api/learning/reset',{method:'POST'});toast('✓ אופס');loadLearn()}catch{toast('⚠')}}
+
+// Boot
+loadSigs();loadWR();loadBreaking();
+loadTradeStatus();
+setInterval(loadSigs,60000);
+setInterval(loadWR,300000);
+setInterval(loadBreaking,60000);
+setInterval(updatePortP,60000);
+
+async function loadTradeStatus(){
+  try{
+    const r=await fetch('/api/autotrade/status');
+    const d=await r.json();
+    const badge=document.getElementById('at-status-badge');
+    const mode=document.getElementById('at-mode');
+    if(d.enabled){
+      badge.textContent='▶ פעיל'+(d.testnet?' (Testnet)':' (LIVE ⚠)');
+      badge.style.background=d.testnet?'var(--blue3)':'var(--red3)';
+      badge.style.color=d.testnet?'var(--blue)':'var(--red)';
+      mode.textContent=d.testnet?'🟡 Testnet':'🔴 LIVE';
+      mode.style.color=d.testnet?'var(--yellow)':'var(--red)';
+    } else {
+      badge.textContent='⏸ כבוי';
+      badge.style.background='var(--red3)';
+      badge.style.color='var(--red)';
+      mode.textContent='כבוי';
+    }
+    document.getElementById('at-exchange').textContent=(d.exchange||'–').toUpperCase();
+    const apis=d.exchanges_configured||{};
+    document.getElementById('at-apis').innerHTML=
+      Object.entries(apis).map(([k,v])=>
+        `<span style="color:${v?'var(--green)':'var(--red)'}">${v?'✓':'✗'} ${k}</span>`
+      ).join('<br>');
+    // Test active exchange balance
+    if(d.enabled && d.exchange){
+      const r2=await fetch('/api/autotrade/test?exchange='+d.exchange,{method:'POST'});
+      const d2=await r2.json();
+      document.getElementById('at-balance').textContent=d2.balance?'$'+d2.balance.toLocaleString():'–';
+      document.getElementById('at-risk').textContent=d2.risk_per_trade?'$'+d2.risk_per_trade:'–';
+      const dot=document.getElementById(d.exchange+'-dot');
+      if(dot){dot.style.background=d2.ok?'var(--green)':'var(--red)';dot.style.boxShadow=d2.ok?'0 0 5px var(--green)':'none'}
+    }
+  }catch(e){console.error('Trade status:',e)}
+}
+
+async function testExchange(ex,btn){
+  const orig=btn.textContent; btn.textContent='⏳ בודק...'; btn.disabled=true;
+  try{
+    const r=await fetch('/api/autotrade/test?exchange='+ex,{method:'POST'});
+    const d=await r.json();
+    const dot=document.getElementById(ex+'-dot');
+    if(d.ok){
+      if(dot){dot.style.background='var(--green)';dot.style.boxShadow='0 0 5px var(--green)'}
+      toast('✅ '+ex.toUpperCase()+' מחובר! יתרה: $'+d.balance+' | סיכון לעסקה: $'+d.risk_per_trade);
+    } else {
+      if(dot){dot.style.background='var(--red)'}
+      toast('✗ '+ex.toUpperCase()+': לא מחובר — בדוק API Key ב-Render');
+    }
+  }catch{toast('⚠ שגיאת רשת')}
+  finally{btn.textContent=orig;btn.disabled=false}
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+  if(e.key==='r')loadSigs();
+  if(e.key==='s')trigJob();
+  if(e.key==='1')showP('dash');
+  if(e.key==='2')showP('news');
+  if(e.key==='3')showP('port');
+  if(e.key==='4')showP('perf');
+  if(e.key==='5')showP('prices');
+  if(e.key==='6')showP('learn');
+});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadSigs()});
+
+</script>
+</body>
+</html>
